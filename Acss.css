@@ -1,0 +1,119 @@
+body {
+    margin: 0;
+}
+
+/* ENTETE */
+header {
+    position: fixed;   
+    top: 0;            
+    left: 0;
+    width: 20%;
+    padding: 0px;
+    text-align: left;
+    font-size: 24px;
+}
+
+/* partie ligne verticale */
+.section-centre {
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ligne-verticale {
+    width: 4px;
+    height: 200px;
+    background-color: black;
+}
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    width: 350px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color:  rgb(85, 2, 2);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color:rgb(161, 24, 24);
+}
+
+/* cacher la checkbox */
+#like {
+    display: none;
+}
+
+/* style label qui va contenir le cœur */
+label {
+    font-size: 50px;
+    cursor: pointer;
+    color: gray;
+    transition: color 0.3s;
+}
+
+/* quand checkbox checked → coeur devient rouge */
+#like:checked + label {
+    color: rgb(146, 10, 10);
+}
+/* cacher toutes les checkbox */
+.star-input {
+    display: none;
+}
+
+/* style étoiles */
+label {
+    font-size: 30px;
+    color:gray;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+/* quand une checkbox est cochée → colorer l'étoile et toutes celles avant */
+input.star-input:checked ~ label.star {
+    color: rgb(179, 155, 21);
+}
+
+/* ordonner les étoiles de droite à gauche */
+.stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+}
+
+/* animation pop (optionnelle) */
+label.star:active {
+    transform: scale(1.2);
+}
