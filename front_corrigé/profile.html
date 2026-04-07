@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moodflix — Profile</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); }
+
+    .profile-page {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      padding: 8rem 2.5rem 5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Profile header */
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 3rem;
+      padding: 2rem;
+      animation: fadeUp 0.7s ease both;
+    }
+    .avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--pink), var(--snapdragon));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+      box-shadow: 0 8px 25px rgba(245,143,154,0.4);
+    }
+    .profile-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+    .profile-name input {
+      background: none;
+      border: none;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      outline: none;
+      width: 250px;
+      padding: 0 0.3rem;
+      transition: border-color 0.3s;
+    }
+    .profile-name input:focus { border-color: var(--pink); }
+    .profile-sub { color: rgba(255,255,255,0.5); font-size: 0.9rem; }
+    .stats-row { display: flex; gap: 1.5rem; margin-top: 0.8rem; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--snapdragon);
+    }
+    .stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
+
+    /* Random suggestion */
+    .suggest-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.7s ease 0.2s both;
+      flex-wrap: wrap;
+    }
+    .suggest-bar .suggest-text { flex: 1; min-width: 200px; }
+    .suggest-bar .suggest-text h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 0.2rem; }
+    .suggest-bar .suggest-text p { color: rgba(255,255,255,0.55); font-size: 0.85rem; }
+    #suggestion-result {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--pink);
+      margin-top: 0.5rem;
+    }
+
+    /* Grid section */
+    .section-wrap {
+      animation: fadeUp 0.7s ease 0.4s both;
+    }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .section-header h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; }
+    .count-pill {
+      padding: 0.2rem 0.7rem;
+      background: rgba(245,143,154,0.15);
+      border-radius: 50px;
+      font-size: 0.78rem;
+      color: var(--pink);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: rgba(255,255,255,0.35);
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+    .empty-state p { font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+    /* Remove from list button */
+    .remove-btn {
+      position: absolute;
+      top: 0.5rem; right: 0.5rem;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      border-radius: 50%;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.8rem;
+      cursor: none;
+      transition: var(--transition);
+      opacity: 0;
+    }
+    .movie-card:hover .remove-btn { opacity: 1; }
+    .remove-btn:hover { background: rgba(245,143,154,0.8); color: #fff; }
+
+    @media (max-width: 600px) {
+      .profile-header { flex-direction: column; text-align: center; }
+      .stats-row { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <div class="page-overlay"></div>
+
+  <nav>
+    <a href="index.html" class="logo" data-transition>Moodflix</a>
+    <button class="hamburger"><span></span><span></span><span></span></button>
+    <ul class="nav-links">
+      <li><a href="all-movies.html" data-transition>All Movies</a></li><li><a href="moods.html" data-transition>Moods</a></li>
+      <li><a href="mood-happy.html" data-transition>Browse</a></li>
+      <li><a href="profile.html" data-transition>Profile</a></li>
+    </ul>
+  </nav>
+
+  <main class="profile-page">
+    <!-- Profile header -->
+    <div class="glass-card profile-header">
+      <div class="avatar">🎬</div>
+      <div>
+        <div class="profile-name">
+          <input type="text" id="username-input" value="Cinephile" placeholder="Your name" maxlength="30" />
+        </div>
+        <p class="profile-sub">Your personal movie sanctuary</p>
+        <div class="stats-row">
+          <div class="stat"><div class="stat-num" id="stat-liked">0</div><div class="stat-label">Liked</div></div>
+          <div class="stat"><div class="stat-num" id="stat-watchlist">0</div><div class="stat-label">Watchlist</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Random Suggestion -->
+    <div class="glass-card suggest-bar">
+      <div class="suggest-text">
+        <h3>🎲 What should I watch?</h3>
+        <p>Let us pick something from your watchlist</p>
+        <div id="suggestion-result"></div>
+      </div>
+      <button class="btn btn-primary" onclick="randomSuggest()">Surprise Me!</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="section-wrap">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('liked', this)">❤️ Liked Movies</button>
+        <button class="tab-btn" onclick="switchTab('watchlist', this)">📌 Watchlist</button>
+      </div>
+
+      <div id="tab-liked">
+        <div class="section-header">
+          <h2>Liked Movies</h2>
+          <span class="count-pill" id="liked-count-badge">0 films</span>
+        </div>
+        <div class="movies-grid" id="liked-grid"></div>
+      </div>
+
+      <div id="tab-watchlist" style="display:none">
+        <div class="section-header">
+          <h2>My Watchlist</h2>
+          <span class="count-pill" id="watchlist-count-badge">0 films</span>
+        </div>
+        <div class="movies-grid" id="watchlist-grid"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="main.js"></script>
+  <script>
+    // Username persistence
+    const unInput = document.getElementById('username-input');
+    unInput.value = localStorage.getItem('moodplex_username') || 'Cinephile';
+    unInput.addEventListener('input', () => localStorage.setItem('moodplex_username', unInput.value));
+
+    const moodPages = {
+      happy: 'mood-happy.html', sad: 'mood-sad.html', romantic: 'mood-romantic.html',
+      excited: 'mood-excited.html', overwhelmed: 'mood-overwhelmed.html', bored: 'mood-bored.html'
+    };
+
+    function createMovieCard(film, listType) {
+      const card = document.createElement('div');
+      card.className = 'movie-card reveal';
+      card.style.position = 'relative';
+      card.innerHTML = `
+        <img src="${film.poster}" alt="${film.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x600/1a1a2e/ffffff?text=${encodeURIComponent(film.title)}'" />
+        <button class="remove-btn" onclick="removeFromList('${listType}','${film.id}')" title="Remove">✕</button>
+        <div class="movie-card-overlay">
+          <a href="movie.html?id=${film.id}&mood=${film.mood}" class="btn btn-primary" style="font-size:.8rem;padding:.5rem 1.1rem" data-transition>View Details</a>
+        </div>
+        <div class="movie-card-body">
+          <h3 class="movie-card-title">${film.title}</h3>
+          <p class="movie-card-year">${film.year}</p>
+          <a href="movie.html?id=${film.id}&mood=${film.mood}" class="btn btn-glass" style="font-size:.78rem;padding:.45rem 1rem;width:100%;justify-content:center" data-transition>View Details</a>
+        </div>`;
+      return card;
+    }
+
+    function renderLiked() {
+      const liked = Storage.getLiked();
+      const grid = document.getElementById('liked-grid');
+      grid.innerHTML = '';
+      document.getElementById('stat-liked').textContent = liked.length;
+      document.getElementById('liked-count-badge').textContent = `${liked.length} films`;
+      if (liked.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><span class="empty-icon">♡</span><p>No liked movies yet.<br/>Browse films and hit the heart button!</p><a href="moods.html" class="btn btn-primary" data-transition>Discover Films</a></div>';
+        return;
+      }
+      liked.forEach(f => grid.appendChild(createMovieCard(f, 'liked')));
+    }
+
+    function renderWatchlist() {
+      const wl = Storage.getWatchlist();
+      const grid = document.getElementById('watchlist-grid');
+      grid.innerHTML = '';
+      document.getElementById('stat-watchlist').textContent = wl.length;
+      document.getElementById('watchlist-count-badge').textContent = `${wl.length} films`;
+      if (wl.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><span class="empty-icon">📌</span><p>Your watchlist is empty.<br/>Add films you want to watch!</p><a href="moods.html" class="btn btn-primary" data-transition>Discover Films</a></div>';
+        return;
+      }
+      wl.forEach(f => grid.appendChild(createMovieCard(f, 'watchlist')));
+    }
+
+    function removeFromList(type, id) {
+      if (type === 'liked') {
+        const list = Storage.getLiked().filter(m => m.id !== id);
+        Storage.setLiked(list);
+        renderLiked();
+        showToast('Removed from Liked');
+      } else {
+        const list = Storage.getWatchlist().filter(m => m.id !== id);
+        Storage.setWatchlist(list);
+        renderWatchlist();
+        showToast('Removed from Watchlist');
+      }
+    }
+
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-liked').style.display = tab === 'liked' ? '' : 'none';
+      document.getElementById('tab-watchlist').style.display = tab === 'watchlist' ? '' : 'none';
+    }
+
+    function randomSuggest() {
+      const wl = Storage.getWatchlist();
+      const res = document.getElementById('suggestion-result');
+      if (wl.length === 0) {
+        res.textContent = 'Add some films to your watchlist first!';
+        res.style.color = 'rgba(255,255,255,0.5)';
+        return;
+      }
+      const pick = wl[Math.floor(Math.random() * wl.length)];
+      res.style.color = 'var(--pink)';
+      res.innerHTML = `🎬 Watch <a href="movie.html?id=${pick.id}&mood=${pick.mood}" data-transition style="color:var(--snapdragon);text-decoration:none;font-weight:600">${pick.title}</a> tonight!`;
+      showToast(`🎲 We suggest: ${pick.title}`);
+    }
+
+    renderLiked();
+    renderWatchlist();
+  </script>
+</body>
+</html>

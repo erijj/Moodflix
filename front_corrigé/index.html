@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moodflix — Find Your Movie</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 1;
+      padding: 2rem;
+    }
+    .hero-content { max-width: 700px; }
+    .hero-eyebrow {
+      font-size: 0.8rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--snapdragon);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.3s forwards;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 700;
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.5s forwards;
+    }
+    .hero-title span {
+      font-style: italic;
+      background: linear-gradient(135deg, var(--pink), var(--snapdragon), var(--leaves));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.7);
+      font-weight: 300;
+      margin-bottom: 3rem;
+      line-height: 1.6;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.7s forwards;
+    }
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.9s forwards;
+    }
+    .hero-btns .btn {
+      animation: float 3s ease-in-out infinite;
+      font-size: 1rem;
+      padding: 1rem 2.2rem;
+    }
+    .hero-btns .btn:last-child { animation-delay: 0.4s; }
+
+    /* Scroll indicator */
+    .scroll-cue {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: fadeIn 1s ease 1.5s both;
+    }
+    .scroll-cue::after {
+      content: '';
+      display: block;
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+      animation: float 1.5s ease-in-out infinite;
+    }
+
+    /* Features strip */
+    .features {
+      position: relative;
+      z-index: 1;
+      padding: 5rem 2rem;
+    }
+    .features-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+    .feature-card {
+      padding: 2rem;
+      text-align: center;
+    }
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .feature-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      margin-bottom: 0.6rem;
+    }
+    .feature-desc {
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.7;
+    }
+
+    /* Mood preview */
+    .mood-preview {
+      position: relative;
+      z-index: 1;
+      padding: 4rem 2rem 6rem;
+    }
+    .mood-preview-inner { max-width: 1100px; margin: 0 auto; }
+    .moods-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+    .mood-chip {
+      padding: 0.6rem 1.4rem;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: none;
+      text-decoration: none;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      transition: var(--transition);
+      backdrop-filter: blur(10px);
+    }
+    .mood-chip:hover { transform: translateY(-4px); }
+    .mood-chip.c-pink { border-color: var(--pink); color: var(--pink); }
+    .mood-chip.c-pink:hover { background: var(--pink); color: #fff; }
+    .mood-chip.c-blue { border-color: var(--periwinkle); color: var(--periwinkle); }
+    .mood-chip.c-blue:hover { background: var(--periwinkle); color: #1a1a2e; }
+    .mood-chip.c-green { border-color: var(--eucalyptus); color: var(--eucalyptus); }
+    .mood-chip.c-green:hover { background: var(--eucalyptus); color: #1a1a2e; }
+    .mood-chip.c-yellow { border-color: var(--snapdragon); color: var(--snapdragon); }
+    .mood-chip.c-yellow:hover { background: var(--snapdragon); color: #1a1a2e; }
+
+    /* Light/Dark toggle */
+    .theme-toggle {
+      position: fixed;
+      bottom: 2rem;
+      left: 2rem;
+      z-index: 200;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.7);
+      cursor: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+    }
+    .theme-toggle:hover { border-color: var(--pink); color: #fff; }
+    [data-light] .theme-toggle {
+      color: #000 !important;
+      background: rgba(255,255,255,0.8) !important;
+      border-color: rgba(0,0,0,0.3) !important;
+      font-weight: 600;
+    }
+    [data-light] .theme-toggle:hover {
+      color: #000 !important;
+      background: rgba(255,255,255,1) !important;
+    }
+    [data-light] body {
+      background: linear-gradient(135deg, #e8eaf6 0%, #f3e5f5 50%, #e0f2f1 100%);
+      color: #1a1a2e;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <div class="page-overlay"></div>
+
+  <!-- Navbar -->
+  <nav>
+    <a href="index.html" class="logo">Moodflix</a>
+    <button class="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="all-movies.html" data-transition>All Movies</a></li><li><a href="moods.html" data-transition>Moods</a></li>
+      <li><a href="mood-happy.html" data-transition>Browse</a></li>
+      <li><a href="profile.html" data-transition>Profile</a></li>
+      <li><a href="profile.html" class="btn btn-primary" data-transition style="padding:0.5rem 1.2rem;font-size:0.82rem">Login</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">✦ Your cinematic companion</p>
+      <h1 class="hero-title">Find the perfect movie<br /><span>for your mood</span></h1>
+      <p class="hero-sub">Let your emotions guide you to the films that truly resonate. From tear-jerking dramas to pure euphoric joy — discover cinema through feeling.</p>
+      <div class="hero-btns">
+        <a href="all-movies.html" class="btn btn-primary" data-transition>🎬 Browse All Movies</a>
+        <a href="moods.html" class="btn btn-glass" data-transition>🌈 Choose Your Mood</a>
+      </div>
+    </div>
+    <div class="scroll-cue">Scroll</div>
+  </section>
+
+  <!-- Features -->
+  <section class="features">
+    <div class="features-inner">
+      <div class="glass-card feature-card reveal">
+        <span class="feature-icon">🎭</span>
+        <h3 class="feature-title">Mood Matching</h3>
+        <p class="feature-desc">Tell us how you feel and our algorithm curates the perfect film to match or shift your emotional state.</p>
+      </div>
+      <div class="glass-card feature-card reveal" style="transition-delay:0.1s">
+        <span class="feature-icon">🧠</span>
+        <h3 class="feature-title">Mood Quiz</h3>
+        <p class="feature-desc">Answer a few thoughtful questions and let us guess your mood to recommend something unexpected.</p>
+      </div>
+      <div class="glass-card feature-card reveal" style="transition-delay:0.2s">
+        <span class="feature-icon">💾</span>
+        <h3 class="feature-title">Personal Library</h3>
+        <p class="feature-desc">Save films to your watchlist and liked collection. Your cinematic taste, always at your fingertips.</p>
+      </div>
+      <div class="glass-card feature-card reveal" style="transition-delay:0.3s">
+        <span class="feature-icon">⭐</span>
+        <h3 class="feature-title">Rate & Review</h3>
+        <p class="feature-desc">Share your thoughts on every film you watch. Rate, comment, and relive your cinematic memories.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mood Preview -->
+  <section class="mood-preview">
+    <div class="mood-preview-inner reveal">
+      <p class="section-sub" style="margin-bottom:0.5rem">EXPLORE BY FEELING</p>
+      <h2 class="section-title">How are you feeling<br /><em>right now?</em></h2>
+      <div class="moods-row" style="margin-top:2rem">
+        <a href="mood-happy.html" class="mood-chip c-yellow" data-transition>😊 Happy</a>
+        <a href="mood-sad.html" class="mood-chip c-blue" data-transition>😢 Sad</a>
+        <a href="mood-romantic.html" class="mood-chip c-pink" data-transition>💕 Romantic</a>
+        <a href="mood-excited.html" class="mood-chip c-yellow" data-transition>⚡ Excited</a>
+        <a href="mood-overwhelmed.html" class="mood-chip c-green" data-transition>😮‍💨 Overwhelmed</a>
+        <a href="mood-bored.html" class="mood-chip" data-transition>😑 Bored</a>
+        <a href="guess-mood.html" class="btn btn-primary" data-transition style="border-radius:50px;padding:0.6rem 1.5rem;font-size:0.9rem">✨ Guess My Mood</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" onclick="toggleTheme()">🌙 Light Mode</button>
+
+  <script src="main.js"></script>
+  <script>
+    function toggleTheme() {
+      document.documentElement.toggleAttribute('data-light');
+      const btn = document.querySelector('.theme-toggle');
+      btn.textContent = document.documentElement.hasAttribute('data-light') ? '☀️ Dark Mode' : '🌙 Light Mode';
+    }
+  </script>
+</body>
+</html>
