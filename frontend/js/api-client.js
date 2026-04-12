@@ -122,7 +122,7 @@ async function toggleWatchlist(movieId, btn) {
   } catch (err) {
     if (err.message.includes('Unauthorized')) {
       showToast('Please log in first.');
-      navigateTo('profile.html');
+      navigateTo('/frontend/pages/profile.html');
     } else {
       showToast(err.message);
     }
@@ -148,7 +148,7 @@ async function toggleLike(movieId, btn) {
   } catch (err) {
     if (err.message.includes('Unauthorized')) {
       showToast('Please log in first.');
-      navigateTo('profile.html');
+      navigateTo('/frontend/pages/profile.html');
     } else {
       showToast(err.message);
     }
@@ -168,7 +168,7 @@ async function submitRating(movieId, stars) {
   } catch (err) {
     if (err.message.includes('Unauthorized')) {
       showToast('Please log in to rate movies.');
-      navigateTo('profile.html');
+      navigateTo('/frontend/pages/profile.html');
     } else {
       showToast(err.message);
     }
@@ -183,7 +183,7 @@ async function surpriseMovie() {
     const movie = ALL_MOVIES.find(m => m.id === res.movie_id);
     if (movie) {
       showToast(`🎲 Surprise! Watching "${movie.title}"`);
-      setTimeout(() => navigateTo(`movie.html?id=${res.movie_id}`), 1200);
+      setTimeout(() => navigateTo(`/frontend/pages/movie.html?id=${res.movie_id}`), 1200);
     } else {
       showToast(`🎲 Random pick: ${res.movie_id}`);
     }
