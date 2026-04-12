@@ -1,266 +1,142 @@
-/* ============================================
-   MOODFLIX — API Client (api-client.js)
-   Plug this into any page that needs backend features.
-   It extends your existing Storage object from main.js
-   and talks to the PHP backend.
-   ============================================ */
+// ============================================
+// api-client.js — Toutes les fonctions pour
+// parler au backend PHP depuis le navigateur
+// ============================================
 
-const API = (() => {
+//Rq: JSON = format pour envoyer des données (comme un objet JS)
 
-  // ── Base fetch helper ──────────────────────
-  async function req(url, method = 'GET', body = null) {
-    const opts = {
-      method,
-      credentials: 'same-origin',   // sends session cookie
-      headers: { 'Content-Type': 'application/json' },
-    };
-    if (body) opts.body = JSON.stringify(body);
+// JSON.stringify() convertit un objet JavaScript en une chaîne JSON, ce qui est nécessaire pour envoyer des données au serveur dans une requête POST.
+// l@ de base du backend
+//en local avec XAMPP:'/backend/api
+const API='/backend/api';
 
-    const res  = await fetch(url, opts);
-    const data = await res.json();
+//-----------------------------------
+//WATCHLIST
+//-----------------------------------
 
-    if (!res.ok) throw new Error(data.error || 'Something went wrong.');
-    return data;
+// Ajouter un film à la watchlist
+async function addToWatchlist(movieId) {
+    // on envoie une requête POST au fichier watchlist.php
+    const response = await fetch(API + '/watchlist.php', {
+        method: 'POST', //On envoie des données (pas juste lire)
+        headers: { 'Content-Type': 'application/json' }, //Les données que j’envoie sont en format JSON
+        body: JSON.stringify({ movie_id: movieId }) // on envoie l'ID du film (c’est les données envoyées au serveur)
+    });
+  
+    const data = await response.json(); // on lit la réponse du PHP
+
+    if (data.succes) {
+        alert('success ' + data.message);
+    } else {
+        alert('echec ' + data.erreur);
+    }
   }
 
-  // ── AUTH ──────────────────────────────────
-  const Auth = {
-    register: (username, email, password) =>
-      req('/api/auth.php?action=register', 'POST', { username, email, password }),
-
-    login: (email, password) =>
-      req('/api/auth.php?action=login', 'POST', { email, password }),
-
-    logout: () =>
-      req('/api/auth.php?action=logout', 'POST'),
-
-    me: () =>
-      req('/api/auth.php?action=me', 'GET'),
-  };
-
-  // ── WATCHLIST ─────────────────────────────
-  const Watchlist = {
-    getAll: () =>
-      req('/api/watchlist.php'),
-
-    add: (movie_id) =>
-      req('/api/watchlist.php', 'POST', { movie_id }),
-
-    remove: (movie_id) =>
-      req('/api/watchlist.php', 'DELETE', { movie_id }),
-
-    // 🎲 Surprise movie — returns a random movie_id from watchlist
-    surprise: () =>
-      req('/api/watchlist.php?surprise=1'),
-  };
-
-  // ── LIKES ─────────────────────────────────
-  const Likes = {
-    getAll: () =>
-      req('/api/likes.php'),
-
-    getForMovie: (movie_id) =>
-      req(`/api/likes.php?movie_id=${movie_id}`),
-
-    // liked = true (❤️) or false (💔)
-    set: (movie_id, liked = true) =>
-      req('/api/likes.php', 'POST', { movie_id, liked }),
-
-    remove: (movie_id) =>
-      req('/api/likes.php', 'DELETE', { movie_id }),
-  };
-
-  // ── COMMENTS ──────────────────────────────
-  const Comments = {
-    // sort: 'newest' | 'oldest'
-    getForMovie: (movie_id, page = 1, sort = 'newest') =>
-      req(`/api/comments.php?movie_id=${movie_id}&page=${page}&sort=${sort}`),
-
-    add: (movie_id, content) =>
-      req('/api/comments.php', 'POST', { movie_id, content }),
-
-    delete: (comment_id) =>
-      req('/api/comments.php', 'DELETE', { comment_id }),
-  };
-
-  // ── RATINGS ───────────────────────────────
-  const Ratings = {
-    getForMovie: (movie_id) =>
-      req(`/api/ratings.php?movie_id=${movie_id}`),
-
-    set: (movie_id, rating) =>
-      req('/api/ratings.php', 'POST', { movie_id, rating }),
-
-    remove: (movie_id) =>
-      req('/api/ratings.php', 'DELETE', { movie_id }),
-  };
-
-  return { Auth, Watchlist, Likes, Comments, Ratings };
-})();
-
-
-/* ============================================
-   UI HELPERS — Drop these anywhere you need
-   interactive watchlist/like/rating buttons.
-   ============================================ */
-
-// ── Watchlist toggle button ────────────────
-async function toggleWatchlist(movieId, btn) {
-  try {
-    const inList = btn.classList.contains('in-watchlist');
-    if (inList) {
-      await API.Watchlist.remove(movieId);
-      btn.classList.remove('in-watchlist');
-      btn.textContent = '+ Watchlist';
-      showToast('Removed from watchlist.');
-    } else {
-      await API.Watchlist.add(movieId);
-      btn.classList.add('in-watchlist');
-      btn.textContent = '✓ Watchlist';
-      showToast('Added to watchlist! 🎬');
-    }
-  } catch (err) {
-    if (err.message.includes('Unauthorized')) {
-      showToast('Please log in first.');
-      navigateTo('/frontend/pages/profile.html');
-    } else {
-      showToast(err.message);
-    }
-  }
-}
-
-// ── Like button ────────────────────────────
-async function toggleLike(movieId, btn) {
-  try {
-    const liked = btn.classList.contains('liked');
-    if (liked) {
-      await API.Likes.remove(movieId);
-      btn.classList.remove('liked');
-      showToast('Like removed.');
-    } else {
-      const res = await API.Likes.set(movieId, true);
-      btn.classList.add('liked');
-      // Update count badge if present
-      const badge = btn.querySelector('.like-count');
-      if (badge) badge.textContent = res.total_likes;
-      showToast('Movie liked! ❤️');
-    }
-  } catch (err) {
-    if (err.message.includes('Unauthorized')) {
-      showToast('Please log in first.');
-      navigateTo('/frontend/pages/profile.html');
-    } else {
-      showToast(err.message);
-    }
-  }
-}
-
-// ── Star rating ────────────────────────────
-async function submitRating(movieId, stars) {
-  try {
-    const res = await API.Ratings.set(movieId, stars);
-    showToast(res.message);
-    // Update displayed average if element exists
-    const avgEl = document.querySelector(`[data-avg-rating="${movieId}"]`);
-    if (avgEl && res.stats.avg_rating) {
-      avgEl.textContent = res.stats.avg_rating + ' ⭐';
-    }
-  } catch (err) {
-    if (err.message.includes('Unauthorized')) {
-      showToast('Please log in to rate movies.');
-      navigateTo('/frontend/pages/profile.html');
-    } else {
-      showToast(err.message);
-    }
-  }
-}
-
-// ── Surprise movie ─────────────────────────
-async function surpriseMovie() {
-  try {
-    const res = await API.Watchlist.surprise();
-    // Find movie in local MOVIES database and navigate
-    const movie = ALL_MOVIES.find(m => m.id === res.movie_id);
-    if (movie) {
-      showToast(`🎲 Surprise! Watching "${movie.title}"`);
-      setTimeout(() => navigateTo(`/frontend/pages/movie.html?id=${res.movie_id}`), 1200);
-    } else {
-      showToast(`🎲 Random pick: ${res.movie_id}`);
-    }
-  } catch (err) {
-    showToast(err.message);
-  }
-}
-
-// ── Render comments section ────────────────
-async function loadComments(movieId, container) {
-  try {
-    const res = await API.Comments.getForMovie(movieId);
-    container.innerHTML = '';
-
-    if (res.comments.length === 0) {
-      container.innerHTML = '<p style="opacity:0.5;font-size:0.9rem">No comments yet. Be the first!</p>';
-      return;
-    }
-
-    res.comments.forEach(c => {
-      const div = document.createElement('div');
-      div.className = 'comment-item glass-card';
-      div.style.cssText = 'padding:1rem 1.2rem;margin-bottom:0.8rem;border-radius:12px';
-      div.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem">
-          <strong style="font-size:0.9rem">${escapeHtml(c.username)}</strong>
-          <span style="font-size:0.75rem;opacity:0.5">${formatDate(c.created_at)}</span>
-        </div>
-        <p style="margin:0;font-size:0.9rem;opacity:0.85;line-height:1.5">${escapeHtml(c.content)}</p>
-        ${c.is_mine ? `<button onclick="deleteComment(${c.id}, this.closest('.comment-item'))"
-          style="margin-top:0.5rem;font-size:0.75rem;opacity:0.5;background:none;border:none;
-                 color:var(--pink);cursor:pointer">🗑 Delete</button>` : ''}
-      `;
-      container.appendChild(div);
+  // Supprimer un film de la watchlist
+async function removeFromWatchlist(movieId) {
+    const response = await fetch(API + '/watchlist.php', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movie_id: movieId })
     });
 
-    // Pagination
-    if (res.total_pages > 1) {
-      const pager = document.createElement('div');
-      pager.style.cssText = 'display:flex;gap:0.5rem;margin-top:1rem;justify-content:center;flex-wrap:wrap';
-      for (let p = 1; p <= res.total_pages; p++) {
-        const btn = document.createElement('button');
-        btn.textContent = p;
-        btn.className = 'btn btn-glass';
-        btn.style.cssText = 'padding:0.3rem 0.8rem;font-size:0.8rem';
-        if (p === res.page) btn.style.borderColor = 'var(--pink)';
-        btn.onclick = () => loadComments(movieId, container, p);
-        pager.appendChild(btn);
-      }
-      container.appendChild(pager);
+    const data = await response.json();
+    alert(data.message || data.erreur);
+}
+
+
+
+
+//-----------------------------------
+// LIKES
+// ----------------------------------
+
+// Liker un film (liked = true) ou disliker (liked = false)
+async function likeMovie(movieId, liked = true) {
+    const response = await fetch(API + '/likes.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movie_id: movieId, liked: liked })
+    });
+
+    const data = await response.json();
+
+    if (data.succes) {
+        // On met à jour le compteur affiché sur la page
+        const compteur = document.getElementById('likes-' + movieId);
+        if (compteur) compteur.textContent = data.total_likes;
+        alert(data.message);
     }
-  } catch (err) {
-    container.innerHTML = `<p style="color:var(--pink)">${err.message}</p>`;
-  }
 }
 
-async function deleteComment(commentId, el) {
-  if (!confirm('Delete this comment?')) return;
-  try {
-    await API.Comments.delete(commentId);
-    el.remove();
-    showToast('Comment deleted.');
-  } catch (err) {
-    showToast(err.message);
-  }
+// ──────────────────────────────────────────
+// COMMENTAIRES
+// ──────────────────────────────────────────
+
+// Charger et afficher les commentaires d'un film
+async function loadComments(movieId) {
+    const response = await fetch(API + '/comments.php?movie_id=' + movieId);
+    const data = await response.json();
+
+    // On trouve la div où afficher les commentaires
+    const container = document.getElementById('comments-list');
+    if (!container) return;
+
+    container.innerHTML = ''; // on vide d'abord
+
+    // Pour chaque commentaire, on crée un bloc HTML
+    data.comments.forEach(comment => {
+        container.innerHTML += `
+            <div style="border: 1px solid #ccc; padding: 10px; margin: 5px 0; border-radius: 8px;">
+                <strong>${comment.username}</strong>
+                <p>${comment.content}</p>
+                <small>${comment.created_at}</small>
+            </div>
+        `;
+    });
 }
 
-// ── Utilities ─────────────────────────────
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+// Envoyer un nouveau commentaire
+async function addComment(movieId) {
+    // On récupère le texte écrit dans le champ
+    const champ = document.getElementById('comment-input');
+    const texte = champ.value.trim();
+
+    if (!texte) {
+        alert('Écris un commentaire d\'abord !');
+        return;
+    }
+
+    const response = await fetch(API + '/comments.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movie_id: movieId, content: texte })
+    });
+
+    const data = await response.json();
+
+    if (data.succes) {
+        champ.value = '';           // on vide le champ
+        loadComments(movieId);      // on recharge les commentaires
+    } else {
+        alert('❌ ' + data.erreur);
+    }
 }
 
-function formatDate(dateStr) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+
+// ──────────────────────────────────────────
+// NOTES (ÉTOILES)
+// ──────────────────────────────────────────
+
+// Envoyer une note pour un film
+async function rateMovie(movieId, note) {
+    const response = await fetch(API + '/ratings.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movie_id: movieId, rating: note })
+    });
+
+    const data = await response.json();
+    alert(data.message || data.erreur);
 }
+
