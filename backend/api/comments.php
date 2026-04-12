@@ -1,6 +1,6 @@
 <?php
 // ============================================
-//  MOODFLIX — Comments API
+//  gere les Comments sur les films
 //  api/comments.php
 //  GET    /api/comments.php?movie_id=X&page=1  → paginated comments
 //  POST   /api/comments.php                    → add comment { movie_id, content }
@@ -24,47 +24,21 @@ $body   = json_decode(file_get_contents('php://input'), true) ?? [];
 
 const COMMENTS_PER_PAGE = 10;
 
-// ── GET — paginated comments for a movie ──
+// ── GET lire les commentaires d'un film 
 if ($method === 'GET') {
+
     $movie_id = trim($_GET['movie_id'] ?? '');
-    if (!$movie_id) jsonResponse(['error' => 'movie_id is required.'], 400);
 
-    $page   = max(1, (int)($_GET['page'] ?? 1));
-    $offset = ($page - 1) * COMMENTS_PER_PAGE;
-
-    // Total count
-    $stmt = $db->prepare('SELECT COUNT(*) as total FROM comments WHERE movie_id = ?');
-    $stmt->execute([$movie_id]);
-    $total = (int)$stmt->fetch()['total'];
-
-    // Sort: 'newest' (default) or 'oldest'
-    $sort  = ($_GET['sort'] ?? 'newest') === 'oldest' ? 'ASC' : 'DESC';
-
-    // Comments + username join
-    $stmt = $db->prepare(
-        "SELECT c.id, c.content, c.created_at,
-                u.username,
-                (c.user_id = :uid) AS is_mine
-         FROM   comments c
-         JOIN   users    u ON u.id = c.user_id
-         WHERE  c.movie_id = :mid
-         ORDER  BY c.created_at $sort
-         LIMIT  :lim OFFSET :off"
+    $stmt=$db->prepare(
+        'SELECT c.id,c.content,c.created_at, u.username
+        FROM comments c
+        JOIN users u ON u.id=c.user_id
+        Where c.movie_id=?
+        ORDER BY c.created_at DESC'
     );
-    $stmt->bindValue(':uid', $user['id'], PDO::PARAM_INT);
-    $stmt->bindValue(':mid', $movie_id,   PDO::PARAM_STR);
-    $stmt->bindValue(':lim', COMMENTS_PER_PAGE, PDO::PARAM_INT);
-    $stmt->bindValue(':off', $offset,     PDO::PARAM_INT);
-    $stmt->execute();
-    $comments = $stmt->fetchAll();
+    $stmt->execute([$movie_id]);
 
-    jsonResponse([
-        'comments'     => $comments,
-        'total'        => $total,
-        'page'         => $page,
-        'per_page'     => COMMENTS_PER_PAGE,
-        'total_pages'  => (int)ceil($total / COMMENTS_PER_PAGE),
-    ]);
+    jsonResponse(['comments' => $stmt->fetchAll()]);
 }
 
 // ── POST — add a comment ───────────────────

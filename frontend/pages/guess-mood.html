@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Moodflix — Guess My Mood</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/frontend/css/style.css" />
   <style>
     body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); }
     .quiz-page {
@@ -166,12 +166,12 @@
   <div class="page-overlay"></div>
 
   <nav>
-    <a href="index.html" class="logo" data-transition>Moodflix</a>
+    <a href="/frontend/index.html" class="logo" data-transition>Moodflix</a>
     <button class="hamburger"><span></span><span></span><span></span></button>
     <ul class="nav-links">
-      <li><a href="all-movies.html" data-transition>All Movies</a></li><li><a href="moods.html" data-transition>Moods</a></li>
-      <li><a href="mood-happy.html" data-transition>Browse</a></li>
-      <li><a href="profile.html" data-transition>Profile</a></li>
+      <li><a href="/frontend/pages/all-movies.html" data-transition>All Movies</a></li><li><a href="/frontend/pages/moods.html" data-transition>Moods</a></li>
+      <li><a href="/frontend/moods/mood-happy.html" data-transition>Browse</a></li>
+      <li><a href="/frontend/pages/profile.html" data-transition>Profile</a></li>
     </ul>
   </nav>
 
@@ -274,25 +274,60 @@
         <div class="result-mood" id="result-mood-label">Happy</div>
         <h2 class="result-title" id="result-title">You're feeling Happy!</h2>
         <p class="result-desc" id="result-desc">Your answers suggest a bright, positive energy. You're ready for films that celebrate life and bring joy.</p>
-        <a id="result-link" href="mood-happy.html" class="btn btn-primary" data-transition>See Your Movies →</a>
+        <a id="result-link" href="/frontend/moods/mood-happy.html" class="btn btn-primary" data-transition>See Your Movies →</a>
       </div>
     </div>
   </main>
 
-  <script src="main.js"></script>
+  <script src="/frontend/js/main.js"></script>
   <script>
     const totalQ = 6;
     let current = 0;
     const answers = [];
 
     const moodMap = {
-      happy: { emoji: '😊', label: 'Happy', desc: 'Your energy is warm and bright. You're ready for films that celebrate life and bring genuine joy.', url: 'mood-happy.html' },
-      sad: { emoji: '😢', label: 'Sad', desc: 'You're in a reflective, tender space. Sometimes a meaningful tearjerker is exactly what the soul needs.', url: 'mood-sad.html' },
-      romantic: { emoji: '💕', label: 'Romantic', desc: 'Your heart is open and longing for connection. Let a beautiful love story wash over you.', url: 'mood-romantic.html' },
-      excited: { emoji: '⚡', label: 'Excited', desc: 'Your energy is electric and ready for anything. High-octane adventures and thrillers await!', url: 'mood-excited.html' },
-      overwhelmed: { emoji: '😮‍💨', label: 'Overwhelmed', desc: 'You need calm, gentle stories that soothe and restore. Let these films be your sanctuary.', url: 'mood-overwhelmed.html' },
-      bored: { emoji: '😑', label: 'Bored', desc: 'You need something engaging and playful to spark your curiosity and lift your spirits.', url: 'mood-bored.html' },
-    };
+  happy: {
+    emoji: "😊",
+    label: "Happy",
+    desc: "Your energy is warm and bright. You're ready for films that celebrate life and bring genuine joy.",
+    url: "mood-happy.html"
+  },
+
+  sad: {
+    emoji: "😢",
+    label: "Sad",
+    desc: "You're in a reflective, tender space. Sometimes a meaningful tearjerker is exactly what the soul needs.",
+    url: "mood-sad.html"
+  },
+
+  romantic: {
+    emoji: "💕",
+    label: "Romantic",
+    desc: "Your heart is open and longing for connection. Let a beautiful love story wash over you.",
+    url: "mood-romantic.html"
+  },
+
+  excited: {
+    emoji: "⚡",
+    label: "Excited",
+    desc: "Your energy is electric and ready for anything. High-octane adventures and thrillers await!",
+    url: "mood-excited.html"
+  },
+
+  overwhelmed: {
+    emoji: "😮‍💨",
+    label: "Overwhelmed",
+    desc: "You need calm and gentle stories that soothe and restore. Let these films be your sanctuary.",
+    url: "mood-overwhelmed.html"
+  },
+
+  bored: {
+    emoji: "😑",
+    label: "Bored",
+    desc: "You need something engaging and playful to spark your curiosity and lift your spirits.",
+    url: "mood-bored.html"
+  }
+};
 
     function initDots() {
       const dots = document.getElementById('dots');
