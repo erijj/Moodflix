@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Moodflix — Feeling Bored</title>
-  <link rel="stylesheet" href="/frontend/css/style.css" />
+  <link rel="stylesheet" href="style.css" />
   <style>
     :root { --mood-color: var(--leaves); --mood-glow: rgba(193,187,122,0.3); }
     body { background: linear-gradient(135deg, #141410 0%, #1f1f0a 50%, #2a2a10 100%); }
@@ -29,25 +29,25 @@
 <body>
   <canvas id="particles-canvas"></canvas><div class="page-overlay"></div>
   <nav>
-    <a href="/frontend/index.html" class="logo" data-transition>Moodflix</a>
+    <a href="index.html" class="logo" data-transition>Moodflix</a>
     <button class="hamburger"><span></span><span></span><span></span></button>
     <ul class="nav-links">
-      <li><a href="/frontend/pages/all-movies.html" data-transition>All Movies</a></li><li><a href="/frontend/pages/moods.html" data-transition>Moods</a></li>
-      <li><a href="/frontend/pages/mood-happy.html" data-transition>Browse</a></li>
-      <li><a href="/frontend/pages/profile.html" data-transition>Profile</a></li>
+      <li><a href="all-movies.html" data-transition>All Movies</a></li><li><a href="moods.html" data-transition>Moods</a></li>
+      <li><a href="mood-happy.html" data-transition>Browse</a></li>
+      <li><a href="profile.html" data-transition>Profile</a></li>
     </ul>
   </nav>
   <div class="mood-hero">
-    <div class="mood-badge">😑 Bored Mood</div>
-    <h1 class="mood-title">Feeling <em>Bored</em> 😑<br />Let's spark something</h1>
+    <div class="mood-badge">😑 Feeling Bored?</div>
+    <h1 class="mood-title">Feeling <em>Bored</em> 😑<br />These will change that</h1>
     <div class="quote-strip">
-      <p class="quote-text">"Boredom is the feeling that everything is a waste of time; serenity, that nothing is."</p>
-      <p class="quote-author">— Thomas Szasz</p>
+      <p class="quote-text">"The right film at the right moment can completely rewire your energy. These are those films."</p>
+      <p class="quote-author">— Moodflix Curation Team</p>
     </div>
   </div>
   <section class="movies-section">
     <div class="movies-header">
-      <h2>Boredom Busters</h2>
+      <h2>Films Guaranteed to Change Your Mood</h2>
       <span class="count-badge" id="movie-count">6 films</span>
     </div>
     <div class="movies-grid" id="movies-grid"></div>
@@ -55,14 +55,13 @@
   <div class="other-moods">
     <h3>Explore other moods →</h3>
     <div class="mood-nav-row">
-      <a href="/frontend/moods/mood-happy.html" class="mood-nav-chip" data-transition>😊 Happy</a>
-      <a href="/frontend/moods/mood-sad.html" class="mood-nav-chip" data-transition>😢 Sad</a>
-      <a href="/frontend/moods/mood-romantic.html" class="mood-nav-chip" data-transition>💕 Romantic</a>
-      <a href="/frontend/moods/mood-excited.html" class="mood-nav-chip" data-transition>⚡ Excited</a>
-      <a href="/frontend/moods/mood-overwhelmed.html" class="mood-nav-chip" data-transition>😮‍💨 Overwhelmed</a>
+      <a href="mood-happy.html" class="mood-nav-chip" data-transition>😊 Happy</a>
+      <a href="mood-sad.html" class="mood-nav-chip" data-transition>😢 Sad</a>
+      <a href="mood-excited.html" class="mood-nav-chip" data-transition>⚡ Excited</a>
+      <a href="mood-overwhelmed.html" class="mood-nav-chip" data-transition>😮‍💨 Overwhelmed</a>
     </div>
   </div>
-  <script src="/frontend/js/main.js"></script>
+  <script src="main.js"></script>
   <script>
     const mood='bored',films=MOVIES[mood]||[],grid=document.getElementById('movies-grid');
     document.getElementById('movie-count').textContent=`${films.length} films`;

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Moodflix — All Movies</title>
-  <link rel="stylesheet" href="/frontend/css/style.css" />
+  <link rel="stylesheet" href="style.css" />
   <style>
     body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); background-attachment: fixed; }
 
@@ -107,7 +107,7 @@
     .mood-pill[data-mood="all"].active { background: linear-gradient(135deg,var(--pink),var(--snapdragon)); border-color: transparent; box-shadow: 0 4px 15px rgba(245,143,154,.35); }
     .mood-pill[data-mood="happy"].active { background: rgba(244,201,132,.25); border-color: var(--snapdragon); color: var(--snapdragon); }
     .mood-pill[data-mood="sad"].active { background: rgba(157,170,209,.25); border-color: var(--periwinkle); color: var(--periwinkle); }
-    .mood-pill[data-mood="romantic"].active { background: rgba(245,143,154,.25); border-color: var(--pink); color: var(--pink); }
+    
     .mood-pill[data-mood="excited"].active { background: rgba(244,201,132,.25); border-color: var(--snapdragon); color: var(--snapdragon); }
     .mood-pill[data-mood="overwhelmed"].active { background: rgba(142,175,146,.25); border-color: var(--eucalyptus); color: var(--eucalyptus); }
     .mood-pill[data-mood="bored"].active { background: rgba(193,187,122,.25); border-color: var(--leaves); color: var(--leaves); }
@@ -222,12 +222,12 @@
   <div class="page-overlay"></div>
 
   <nav>
-    <a href="/frontend/index.html" class="logo" data-transition>Moodflix</a>
+    <a href="index.html" class="logo" data-transition>Moodflix</a>
     <button class="hamburger"><span></span><span></span><span></span></button>
     <ul class="nav-links">
-      <li><a href="/frontend/pages/moods.html" data-transition>Moods</a></li>
-      <li><a href="/frontend/pages/guess-mood.html" data-transition>Quiz</a></li>
-      <li><a href="/frontend/pages/profile.html" data-transition>Profile</a></li>
+      <li><a href="moods.html" data-transition>Moods</a></li>
+      <li><a href="guess-mood.html" data-transition>Quiz</a></li>
+      <li><a href="profile.html" data-transition>Profile</a></li>
     </ul>
   </nav>
 
@@ -267,7 +267,6 @@
       <button class="mood-pill active" data-mood="all" onclick="setMood('all',this)">🎬 All Moods</button>
       <button class="mood-pill" data-mood="happy" onclick="setMood('happy',this)">😊 Happy</button>
       <button class="mood-pill" data-mood="sad" onclick="setMood('sad',this)">😢 Sad</button>
-      <button class="mood-pill" data-mood="romantic" onclick="setMood('romantic',this)">💕 Romantic</button>
       <button class="mood-pill" data-mood="excited" onclick="setMood('excited',this)">⚡ Excited</button>
       <button class="mood-pill" data-mood="overwhelmed" onclick="setMood('overwhelmed',this)">😮‍💨 Overwhelmed</button>
       <button class="mood-pill" data-mood="bored" onclick="setMood('bored',this)">😑 Bored</button>
@@ -279,7 +278,7 @@
   <!-- Movies output -->
   <div id="movies-output" class="movies-section"></div>
 
-  <script src="/frontend/js/main.js"></script>
+  <script src="main.js"></script>
   <script>
     // ── State ──
     let activeMood = 'all';
@@ -291,7 +290,6 @@
     const moodConfig = {
       happy:       { emoji:'😊', label:'Happy',       color:'var(--snapdragon)', page:'mood-happy.html' },
       sad:         { emoji:'😢', label:'Sad',         color:'var(--periwinkle)', page:'mood-sad.html' },
-      romantic:    { emoji:'💕', label:'Romantic',    color:'var(--pink)',       page:'mood-romantic.html' },
       excited:     { emoji:'⚡', label:'Excited',     color:'var(--snapdragon)', page:'mood-excited.html' },
       overwhelmed: { emoji:'😮‍💨', label:'Overwhelmed', color:'var(--eucalyptus)', page:'mood-overwhelmed.html' },
       bored:       { emoji:'😑', label:'Bored',       color:'var(--leaves)',     page:'mood-bored.html' },
@@ -409,7 +407,7 @@
         output.appendChild(grid);
       } else {
         // Grouped by mood
-        const moods = ['happy','sad','romantic','excited','overwhelmed','bored'];
+        const moods = ['happy','sad','excited','overwhelmed','bored'];
         moods.forEach(mood => {
           const films = filtered.filter(f => f.mood === mood);
           if (films.length === 0) return;

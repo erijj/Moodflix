@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Moodflix — Feeling Sad</title>
-  <link rel="stylesheet" href="/frontend/css/style.css" />
+  <link rel="stylesheet" href="style.css" />
   <style>
     :root { --mood-color: var(--periwinkle); --mood-glow: rgba(157,170,209,0.3); }
     body { background: linear-gradient(135deg, #0d1117 0%, #141b2d 50%, #1a2540 100%); }
@@ -29,25 +29,25 @@
 <body>
   <canvas id="particles-canvas"></canvas><div class="page-overlay"></div>
   <nav>
-    <a href="/frontend/index.html" class="logo" data-transition>Moodflix</a>
+    <a href="index.html" class="logo" data-transition>Moodflix</a>
     <button class="hamburger"><span></span><span></span><span></span></button>
     <ul class="nav-links">
-      <li><a href="/frontend/pages/all-movies.html" data-transition>All Movies</a></li><li><a href="/frontend/pages/moods.html" data-transition>Moods</a></li>
-      <li><a href="/frontend/moods/mood-happy.html" data-transition>Browse</a></li>
-      <li><a href="/frontend/pages/profile.html" data-transition>Profile</a></li>
+      <li><a href="all-movies.html" data-transition>All Movies</a></li><li><a href="moods.html" data-transition>Moods</a></li>
+      <li><a href="mood-happy.html" data-transition>Browse</a></li>
+      <li><a href="profile.html" data-transition>Profile</a></li>
     </ul>
   </nav>
   <div class="mood-hero">
-    <div class="mood-badge">😢 Sad Mood</div>
-    <h1 class="mood-title">Feeling <em>Blue</em> 🌧️<br />Let it out</h1>
+    <div class="mood-badge">😢 Feeling Down?</div>
+    <h1 class="mood-title">Feeling <em>Down</em> 😢<br />Let these lift you up</h1>
     <div class="quote-strip">
-      <p class="quote-text">"Tears come from the heart and not from the brain. To weep is to make less the depth of grief."</p>
-      <p class="quote-author">— Leonardo da Vinci</p>
+      <p class="quote-text">"Sometimes the best way out of sadness is to let a beautiful story remind you that life can be wonderful."</p>
+      <p class="quote-author">— Moodflix Curation Team</p>
     </div>
   </div>
   <section class="movies-section">
     <div class="movies-header">
-      <h2>Sad Picks</h2>
+      <h2>Films to Make You Smile Again</h2>
       <span class="count-badge" id="movie-count">6 films</span>
     </div>
     <div class="movies-grid" id="movies-grid"></div>
@@ -55,18 +55,17 @@
   <div class="other-moods">
     <h3>Explore other moods →</h3>
     <div class="mood-nav-row">
-      <a href="/frontend/moods/mood-happy.html" class="mood-nav-chip" data-transition>😊 Happy</a>
-      <a href="/frontend/moods/mood-romantic.html" class="mood-nav-chip" data-transition>💕 Romantic</a>
-      <a href="/frontend/moods/mood-excited.html" class="mood-nav-chip" data-transition>⚡ Excited</a>
-      <a href="/frontend/moods/mood-overwhelmed.html" class="mood-nav-chip" data-transition>😮‍💨 Overwhelmed</a>
-      <a href="/frontend/moods/mood-bored.html" class="mood-nav-chip" data-transition>😑 Bored</a>
+      <a href="mood-happy.html" class="mood-nav-chip" data-transition>😊 Happy</a>
+      <a href="mood-excited.html" class="mood-nav-chip" data-transition>⚡ Excited</a>
+      <a href="mood-overwhelmed.html" class="mood-nav-chip" data-transition>😮‍💨 Overwhelmed</a>
+      <a href="mood-bored.html" class="mood-nav-chip" data-transition>😑 Bored</a>
     </div>
   </div>
-  <script src="/frontend/js/main.js"></script>
+  <script src="main.js"></script>
   <script>
     const mood='sad',films=MOVIES[mood]||[],grid=document.getElementById('movies-grid');
     document.getElementById('movie-count').textContent=`${films.length} films`;
-    films.forEach((film,i)=>{const card=document.createElement('div');card.className='movie-card reveal';card.style.transitionDelay=`${i*.07}s`;card.innerHTML=`<img src="${film.poster}" alt="${film.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x600/0d1117/ffffff?text=${encodeURIComponent(film.title)}'"/><div class="movie-card-body"><h3 class="movie-card-title">${film.title}</h3><p class="movie-card-year">${film.year}</p><a href="../pages/movie.html?id=${film.id}&mood=${film.mood}" class="btn btn-glass" style="font-size:.78rem;padding:.45rem 1rem;width:100%;justify-content:center" data-transition>View Details</a></div>`;grid.appendChild(card);});
+    films.forEach((film,i)=>{const card=document.createElement('div');card.className='movie-card reveal';card.style.transitionDelay=`${i*.07}s`;card.innerHTML=`<img src="${film.poster}" alt="${film.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x600/0d1117/ffffff?text=${encodeURIComponent(film.title)}'"/><div class="movie-card-body"><h3 class="movie-card-title">${film.title}</h3><p class="movie-card-year">${film.year}</p><a href="movie.html?id=${film.id}&mood=${film.mood}" class="btn btn-glass" style="font-size:.78rem;padding:.45rem 1rem;width:100%;justify-content:center" data-transition>View Details</a></div>`;grid.appendChild(card);});
   </script>
 </body>
 </html>
