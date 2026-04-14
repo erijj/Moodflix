@@ -90,3 +90,88 @@ if ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 jsonResponse(['error' => 'Invalid action.'], 400);
+
+
+// ============================================
+// AJOUTER PAR MIRAL
+//  FORGOT PASSWORD — Demander réinitialisation
+//  Appel : POST /api/auth.php?action=forgot_password
+//  Body  : { email }
+// ============================================
+if ($action === 'forgot_password' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $email = trim($body['email'] ?? '');
+
+    if (!$email) {
+        jsonResponse(['error' => 'Email requis.'], 400);
+    }
+
+    $db   = getDB();
+    $stmt = $db->prepare('SELECT id FROM users WHERE email = ?');
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
+
+    // Réponse identique que l'email existe ou non (sécurité anti-énumération)
+    if ($user) {
+        // Générer un token aléatoire sécurisé
+        $rawToken  = bin2hex(random_bytes(32));               // Token brut (envoyé par email)
+        $hashToken = hash('sha256', $rawToken);               // Token hashé (stocké en base)
+        $expires   = date('Y-m-d H:i:s', strtotime('+30 minutes'));
+
+        $db->prepare('UPDATE users SET reset_token = ?, reset_expires = ? WHERE id = ?')
+           ->execute([$hashToken, $expires, $user['id']]);
+
+        // TODO : Envoyer l'email avec PHPMailer
+        // Exemple : reset-password.html?token=$rawToken
+        // Pour l'instant, le token est affiché en log (dev uniquement)
+        error_log("=== MOODFLIX RESET TOKEN (dev) ===");
+        error_log("Email  : $email");
+        error_log("Token  : $rawToken");
+        error_log("Expire : $expires");
+        error_log("URL    : http://localhost/moodflix/reset-password.html?token=$rawToken");
+    }
+
+    jsonResponse(['success' => true, 'message' => 'Si cet email existe, un lien a été envoyé.']);
+}
+
+// ============================================
+//  RESET PASSWORD — Réinitialiser le mot de passe
+//  Appel : POST /api/auth.php?action=reset_password
+//  Body  : { token, new_password }
+// ============================================
+if ($action === 'reset_password' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $rawToken    = trim($body['token']        ?? '');
+    $newPassword = trim($body['new_password'] ?? '');
+
+    if (!$rawToken || !$newPassword) {
+        jsonResponse(['error' => 'Token et nouveau mot de passe requis.'], 400);
+    }
+    if (strlen($newPassword) < 6) {
+        jsonResponse(['error' => 'Minimum 6 caractères requis.'], 400);
+    }
+
+    // Hasher le token reçu pour comparer avec celui en base
+    $hashToken = hash('sha256', $rawToken);
+    $db = getDB();
+
+    // Chercher un utilisateur avec ce token non expiré
+    $stmt = $db->prepare(
+        'SELECT id FROM users
+         WHERE reset_token = ? AND reset_expires > NOW()'
+    );
+    $stmt->execute([$hashToken]);
+    $user = $stmt->fetch();
+
+    if (!$user) {
+        jsonResponse(['error' => 'Token invalide ou expiré. Refaites la demande.'], 400);
+    }
+
+    // Mettre à jour le mot de passe et effacer le token
+    $newHash = password_hash($newPassword, PASSWORD_BCRYPT);
+    $db->prepare(
+        'UPDATE users SET password = ?, reset_token = NULL, reset_expires = NULL WHERE id = ?'
+    )->execute([$newHash, $user['id']]);
+
+    jsonResponse(['success' => true, 'message' => 'Mot de passe réinitialisé avec succès. Vous pouvez vous connecter.']);
+}
