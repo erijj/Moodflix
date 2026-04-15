@@ -16,7 +16,7 @@ USE moodflix;
 --  Utilisée par : auth.php, user.php
 -- ============================================
 CREATE TABLE IF NOT EXISTS users (
-  id                      INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+  id                      INT UNSIGNED    NOT NULL AUTO_INCREMENT,>
   username                VARCHAR(50)     NOT NULL UNIQUE,
   email                   VARCHAR(150)    NOT NULL UNIQUE,
   password                VARCHAR(255)    NOT NULL,
