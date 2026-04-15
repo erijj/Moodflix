@@ -197,40 +197,10 @@
       color: #000 !important;
       background: rgba(255,255,255,1) !important;
     }
-    /* This forces the background and general text */
-[data-light] body {
-  background: linear-gradient(
-    135deg,
-    #e8eaf6 0%,
-    #f3e5f5 50%,
-    #e0f2f1 100%
-  ) !important;
-  color: #000000 !important;
-}
-
-/* This targets EVERY piece of text inside light mode (cards, buttons, headers) */
-[data-light] h1, 
-[data-light] h2, 
-[data-light] h3, 
-[data-light] p, 
-[data-light] span, 
-[data-light] div,
-[data-light] a {
-  color: #000000 !important;
-}
-
-/* Restoring your original button style but ensuring black text */
-[data-light] .theme-toggle {
-  color: #000000 !important;
-  background: rgba(255, 255, 255, 0.8) !important;
-  border-color: rgba(0, 0, 0, 0.3) !important;
-  font-weight: 600;
-}
-
-[data-light] .theme-toggle:hover {
-  color: #000000 !important;
-  background: rgba(255, 255, 255, 1) !important;
-}
+    [data-light] body {
+      background: linear-gradient(135deg, #e8eaf6 0%, #f3e5f5 50%, #e0f2f1 100%);
+      color: #1a1a2e;
+    }
   </style>
 </head>
 <body>
@@ -247,7 +217,7 @@
       <li><a href="all-movies.html" data-transition>All Movies</a></li><li><a href="moods.html" data-transition>Moods</a></li>
       <li><a href="mood-happy.html" data-transition>Browse</a></li>
       <li><a href="profile.html" data-transition>Profile</a></li>
-      <li><a href="profile.html" class="btn btn-primary" data-transition style="padding:0.5rem 1.2rem;font-size:0.82rem">Login</a></li>
+      <li><a href="login.html" class="btn btn-primary" data-transition style="padding:0.5rem 1.2rem;font-size:0.82rem">Login</a></li>
     </ul>
   </nav>
 
@@ -258,8 +228,8 @@
       <h1 class="hero-title">Find the perfect movie<br /><span>for your mood</span></h1>
       <p class="hero-sub">Let your emotions guide you to the films that truly resonate. From tear-jerking dramas to pure euphoric joy — discover cinema through feeling.</p>
       <div class="hero-btns">
-        <a href="all-movies.html" class="btn btn-primary" data-transition> Browse All Movies</a>
-        <a href="moods.html" class="btn btn-glass" data-transition> Choose Your Mood</a>
+        <a href="all-movies.html" class="btn btn-primary" data-transition>🎬 Browse All Movies</a>
+        <a href="moods.html" class="btn btn-glass" data-transition>🌈 Choose Your Mood</a>
       </div>
     </div>
     <div class="scroll-cue">Scroll</div>
@@ -305,8 +275,8 @@
         <a href="guess-mood.html" class="btn btn-primary" data-transition style="border-radius:50px;padding:0.6rem 1.5rem;font-size:0.9rem">✨ Guess My Mood</a>
       </div>
     </div>
-  </section>section
-  
+  </section>
+
   <!-- Theme Toggle -->
   <button class="theme-toggle" onclick="toggleTheme()">🌙 Light Mode</button>
 

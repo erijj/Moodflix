@@ -240,7 +240,7 @@
     });
     left.textContent = remaining > 0 ? `${remaining} remaining` : 'No attempts left';
 
-    
+    // If max attempts reached, disable retry and show lockout
     if (attempts >= maxAttempts) {
       document.querySelector('.btn-retry').style.opacity = '0.4';
       document.querySelector('.btn-retry').style.pointerEvents = 'none';
