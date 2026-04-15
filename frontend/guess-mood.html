@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Moodflix — Guess My Mood</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        background: linear-gradient(
+          135deg,
+          #1a1a2e 0%,
+          #16213e 50%,
+          #0f3460 100%
+        );
+      }
+      .quiz-page {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 7rem 2rem 4rem;
+        position: relative;
+        z-index: 1;
+      }
+      .quiz-wrap {
+        width: 100%;
+        max-width: 640px;
+      }
+      .quiz-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+      }
+      .quiz-header .eyebrow {
+        font-size: 0.78rem;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: var(--snapdragon);
+        font-weight: 600;
+        display: block;
+        margin-bottom: 1rem;
+      }
+      .quiz-header h1 {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+      }
+      .quiz-header p {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.95rem;
+        margin-top: 0.7rem;
+      }
+
+      /* Question card */
+      .question-card {
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        display: none;
+      }
+      .question-card.active {
+        display: block;
+        animation: fadeUp 0.5s ease;
+      }
+      .question-num {
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+        color: var(--pink);
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+      }
+      .question-text {
+        font-family: "Playfair Display", serif;
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        line-height: 1.3;
+      }
+
+      /* Radio cards */
+      .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+      }
+      .option-label {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.9rem 1.1rem;
+        border-radius: 14px;
+        border: 1px solid var(--glass-border);
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        cursor: none;
+        transition: var(--transition);
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.85);
+      }
+      .option-label input {
+        display: none;
+      }
+      .option-label .check {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        flex-shrink: 0;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .option-label input:checked ~ .check {
+        background: var(--pink);
+        border-color: var(--pink);
+        box-shadow: 0 0 12px rgba(245, 143, 154, 0.5);
+      }
+      .option-label input:checked ~ .check::after {
+        content: "✓";
+        font-size: 10px;
+        color: #fff;
+      }
+      .option-label:hover {
+        border-color: var(--pink);
+        background: rgba(245, 143, 154, 0.1);
+        transform: translateY(-2px);
+      }
+      .option-label:has(input:checked) {
+        border-color: var(--pink);
+        background: rgba(245, 143, 154, 0.15);
+      }
+
+      /* Quiz nav */
+      .quiz-nav {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        margin-top: 1.5rem;
+      }
+
+      /* Result */
+      .result-card {
+        display: none;
+        text-align: center;
+        padding: 3rem 2rem;
+      }
+      .result-emoji {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: block;
+        animation: float 2s ease-in-out infinite;
+      }
+      .result-title {
+        font-family: "Playfair Display", serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+      .result-desc {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+        line-height: 1.7;
+      }
+      .result-mood {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        background: linear-gradient(135deg, var(--pink), var(--snapdragon));
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .step-dots {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: var(--transition);
+      }
+      .dot.active {
+        background: var(--pink);
+        transform: scale(1.3);
+      }
+      .dot.done {
+        background: var(--eucalyptus);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="particles-canvas"></canvas>
+    <div class="page-overlay"></div>
+
+    <nav>
+      <a href="index.html" class="logo" data-transition>Moodflix</a>
+      <button class="hamburger"><span></span><span></span><span></span></button>
+      <ul class="nav-links">
+        <li><a href="all-movies.html" data-transition>All Movies</a></li>
+        <li><a href="moods.html" data-transition>Moods</a></li>
+        <li><a href="mood-happy.html" data-transition>Browse</a></li>
+        <li><a href="profile.html" data-transition>Profile</a></li>
+      </ul>
+    </nav>
+
+    <main class="quiz-page">
+      <div class="quiz-wrap">
+        <div class="quiz-header">
+          <span class="eyebrow">✦ Mood detection</span>
+          <h1>Guess My Mood</h1>
+          <p>
+            A science-based assessment using the PANAS scale &amp; Russell's
+            Circumplex Model of Affect
+          </p>
+          <div
+            style="
+              margin-top: 0.8rem;
+              padding: 0.6rem 1rem;
+              background: rgba(157, 170, 209, 0.1);
+              border: 1px solid rgba(157, 170, 209, 0.25);
+              border-radius: 12px;
+              font-size: 0.75rem;
+              color: rgba(255, 255, 255, 0.55);
+              line-height: 1.6;
+            "
+          >
+            📚
+            <strong style="color: rgba(255, 255, 255, 0.75)"
+              >Scientific basis:</strong
+            >
+            Watson, Clark &amp; Tellegen (1988) — PANAS Scale &middot; Russell
+            (1980) — Circumplex Model of Affect &middot;
+            <em
+              >Journal of Personality and Social Psychology, 54(6),
+              1063–1070</em
+            >
+          </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress" style="width: 0%"></div>
+        </div>
+
+        <!-- Step dots -->
+        <div class="step-dots" id="dots"></div>
+
+        <!--
+        SCORING SYSTEM — based on Russell's Circumplex Model (1980):
+        Each answer scores points on two axes:
+          V = Valence    (positive ↑ vs negative ↓)
+          A = Arousal    (high ↑ vs low ↓)
+
+        Mood mapping on the circumplex:
+          Happy      → High Valence (+) / Medium Arousal     → V: +2, A: +1
+          Excited    → High Valence (+) / High Arousal (+)   → V: +2, A: +2
+          Romantic   → High Valence (+) / Low Arousal (-)    → V: +2, A: -1
+          Overwhelmed→ Low Valence  (-) / High Arousal (+)   → V: -1, A: +2
+          Sad        → Low Valence  (-) / Low Arousal (-)    → V: -2, A: -2
+          Bored      → Neutral Valence  / Low Arousal (-)    → V:  0, A: -2
+
+        Source: Russell, J.A. (1980). A circumplex model of affect.
+        Journal of Personality and Social Psychology, 39(6), 1161–1178.
+      -->
+
+        <div id="questions-container">
+          <!-- Q1: PANAS — Positive Affect item (attentive/active) -->
+          <div class="glass-card question-card active" data-q="0">
+            <p class="question-num">
+              Question 1 of 6 &nbsp;·&nbsp;
+              <span style="color: rgba(255, 255, 255, 0.4); font-weight: 400"
+                >PANAS: Positive Affect</span
+              >
+            </p>
+            <h2 class="question-text">
+              Right now, how would you describe your level of enthusiasm and
+              energy?
+            </h2>
+            <p
+              style="
+                font-size: 0.75rem;
+                color: rgba(255, 255, 255, 0.38);
+                margin-bottom: 1rem;
+                font-style: italic;
+              "
+            >
+              Based on PANAS item: "Enthusiastic / Active / Alert" — Watson et
+              al., 1988
+            </p>
+            <div class="options-grid">
+              <label class="option-label"
+                ><input type="radio" name="q0" data-v="2" data-a="2" /><span
+                  class="check"
+                ></span
+                >⚡ Very high — I feel energised and enthusiastic</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q0" data-v="2" data-a="1" /><span
+                  class="check"
+                ></span
+                >🌤️ Moderate — I feel engaged and fairly good</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q0" data-v="-1" data-a="-1" /><span
+                  class="check"
+                ></span
+                >🌫️ Low — I feel sluggish and disengaged</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q0" data-v="-2" data-a="-2" /><span
+                  class="check"
+                ></span
+                >🌧️ Very low — I feel drained and flat</label
+              >
+            </div>
+          </div>
+
+          <!-- Q2: PANAS — Negative Affect item (distressed/upset) -->
+          <div class="glass-card question-card" data-q="1">
+            <p class="question-num">
+              Question 2 of 6 &nbsp;·&nbsp;
+              <span style="color: rgba(255, 255, 255, 0.4); font-weight: 400"
+                >PANAS: Negative Affect</span
+              >
+            </p>
+            <h2 class="question-text">
+              To what extent are you experiencing feelings of distress, tension
+              or irritability?
+            </h2>
+            <p
+              style="
+                font-size: 0.75rem;
+                color: rgba(255, 255, 255, 0.38);
+                margin-bottom: 1rem;
+                font-style: italic;
+              "
+            >
+              Based on PANAS item: "Distressed / Upset / Hostile" — Watson et
+              al., 1988
+            </p>
+            <div class="options-grid">
+              <label class="option-label"
+                ><input type="radio" name="q1" data-v="-2" data-a="2" /><span
+                  class="check"
+                ></span
+                >🔥 Extremely — I feel tense, overwhelmed or hostile</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q1" data-v="-1" data-a="1" /><span
+                  class="check"
+                ></span
+                >😬 Somewhat — I feel mildly irritable or uneasy</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q1" data-v="1" data-a="0" /><span
+                  class="check"
+                ></span
+                >😌 A little — I feel mostly calm with slight tension</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q1" data-v="2" data-a="-1" /><span
+                  class="check"
+                ></span
+                >☁️ Not at all — I feel calm and undisturbed</label
+              >
+            </div>
+          </div>
+
+          <!-- Q3: Russell Circumplex — Valence axis (pleasantness) -->
+          <div class="glass-card question-card" data-q="2">
+            <p class="question-num">
+              Question 3 of 6 &nbsp;·&nbsp;
+              <span style="color: rgba(255, 255, 255, 0.4); font-weight: 400"
+                >Circumplex: Valence Axis</span
+              >
+            </p>
+            <h2 class="question-text">
+              How pleasant or unpleasant does your current emotional state feel
+              overall?
+            </h2>
+            <p
+              style="
+                font-size: 0.75rem;
+                color: rgba(255, 255, 255, 0.38);
+                margin-bottom: 1rem;
+                font-style: italic;
+              "
+            >
+              Valence dimension — Russell's Circumplex Model, 1980
+            </p>
+            <div class="options-grid">
+              <label class="option-label"
+                ><input type="radio" name="q2" data-v="2" data-a="1" /><span
+                  class="check"
+                ></span
+                >😊 Very pleasant — I feel genuinely good</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q2" data-v="2" data-a="-1" /><span
+                  class="check"
+                ></span
+                >🌸 Pleasant but quiet — content and at ease</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q2" data-v="-1" data-a="2" /><span
+                  class="check"
+                ></span
+                >😟 Unpleasant and activated — anxious or tense</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q2" data-v="-2" data-a="-2" /><span
+                  class="check"
+                ></span
+                >😔 Unpleasant and low — sad or withdrawn</label
+              >
+            </div>
+          </div>
+
+          <!-- Q4: Russell Circumplex — Arousal axis (activation level) -->
+          <div class="glass-card question-card" data-q="3">
+            <p class="question-num">
+              Question 4 of 6 &nbsp;·&nbsp;
+              <span style="color: rgba(255, 255, 255, 0.4); font-weight: 400"
+                >Circumplex: Arousal Axis</span
+              >
+            </p>
+            <h2 class="question-text">
+              How would you describe your current level of physical and mental
+              activation?
+            </h2>
+            <p
+              style="
+                font-size: 0.75rem;
+                color: rgba(255, 255, 255, 0.38);
+                margin-bottom: 1rem;
+                font-style: italic;
+              "
+            >
+              Arousal dimension — Russell's Circumplex Model, 1980
+            </p>
+            <div class="options-grid">
+              <label class="option-label"
+                ><input type="radio" name="q3" data-v="1" data-a="2" /><span
+                  class="check"
+                ></span
+                >🏃 Very high — alert, activated, fast-thinking</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q3" data-v="2" data-a="1" /><span
+                  class="check"
+                ></span
+                >🚶 Moderate — engaged but not overloaded</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q3" data-v="1" data-a="-1" /><span
+                  class="check"
+                ></span
+                >🧘 Low — calm, peaceful and relaxed</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q3" data-v="-1" data-a="-2" /><span
+                  class="check"
+                ></span
+                >🛌 Very low — fatigued, passive or withdrawn</label
+              >
+            </div>
+          </div>
+
+          <!-- Q5: PANAS — Positive Affect (interested/inspired) -->
+          <div class="glass-card question-card" data-q="4">
+            <p class="question-num">
+              Question 5 of 6 &nbsp;·&nbsp;
+              <span style="color: rgba(255, 255, 255, 0.4); font-weight: 400"
+                >PANAS: Positive Affect</span
+              >
+            </p>
+            <h2 class="question-text">
+              How interested, inspired or determined do you feel right now?
+            </h2>
+            <p
+              style="
+                font-size: 0.75rem;
+                color: rgba(255, 255, 255, 0.38);
+                margin-bottom: 1rem;
+                font-style: italic;
+              "
+            >
+              Based on PANAS items: "Interested / Inspired / Determined" —
+              Watson et al., 1988
+            </p>
+            <div class="options-grid">
+              <label class="option-label"
+                ><input type="radio" name="q4" data-v="2" data-a="2" /><span
+                  class="check"
+                ></span
+                >🎯 Extremely — I feel driven, inspired and motivated</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q4" data-v="2" data-a="0" /><span
+                  class="check"
+                ></span
+                >💛 Somewhat — I feel reasonably interested and okay</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q4" data-v="0" data-a="-1" /><span
+                  class="check"
+                ></span
+                >😐 A little — I feel indifferent, neither here nor there</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q4" data-v="-2" data-a="-2" /><span
+                  class="check"
+                ></span
+                >🌑 Not at all — I feel uninspired and empty inside</label
+              >
+            </div>
+          </div>
+
+          <!-- Q6: PANAS — Negative Affect (scared/guilty/ashamed) + Valence -->
+          <div class="glass-card question-card" data-q="5">
+            <p class="question-num">
+              Question 6 of 6 &nbsp;·&nbsp;
+              <span style="color: rgba(255, 255, 255, 0.4); font-weight: 400"
+                >PANAS: Negative Affect</span
+              >
+            </p>
+            <h2 class="question-text">
+              How much are you experiencing feelings of guilt, sadness or fear
+              right now?
+            </h2>
+            <p
+              style="
+                font-size: 0.75rem;
+                color: rgba(255, 255, 255, 0.38);
+                margin-bottom: 1rem;
+                font-style: italic;
+              "
+            >
+              Based on PANAS items: "Guilty / Afraid / Ashamed / Scared" —
+              Watson et al., 1988
+            </p>
+            <div class="options-grid">
+              <label class="option-label"
+                ><input type="radio" name="q5" data-v="-2" data-a="-2" /><span
+                  class="check"
+                ></span
+                >💔 Very much — I feel quite sad, guilty or afraid</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q5" data-v="-1" data-a="2" /><span
+                  class="check"
+                ></span
+                >😰 Somewhat — mild anxiety or worry is present</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q5" data-v="1" data-a="0" /><span
+                  class="check"
+                ></span
+                >🌿 A little — mostly okay with minor low feelings</label
+              >
+              <label class="option-label"
+                ><input type="radio" name="q5" data-v="2" data-a="1" /><span
+                  class="check"
+                ></span
+                >✨ Not at all — I feel light, open and at peace</label
+              >
+            </div>
+          </div>
+        </div>
+        <!-- /questions -->
+
+        <!-- Nav buttons -->
+        <div class="quiz-nav" id="quiz-nav">
+          <button
+            class="btn btn-glass"
+            id="prev-btn"
+            onclick="prevQ()"
+            style="display: none"
+          >
+            ← Back
+          </button>
+          <button
+            class="btn btn-primary"
+            id="next-btn"
+            onclick="nextQ()"
+            style="margin-left: auto"
+          >
+            Next →
+          </button>
+        </div>
+
+        <!-- Result -->
+        <div class="glass-card result-card" id="result-card">
+          <span class="result-emoji" id="result-emoji">😊</span>
+          <div class="result-mood" id="result-mood-label">Happy</div>
+          <h2 class="result-title" id="result-title">You are feeling Happy!</h2>
+          <p class="result-desc" id="result-desc"></p>
+          <div
+            id="result-scores"
+            style="
+              display: flex;
+              gap: 1.5rem;
+              justify-content: center;
+              margin-bottom: 1.5rem;
+              flex-wrap: wrap;
+            "
+          ></div>
+          <div
+            style="
+              font-size: 0.72rem;
+              color: rgba(255, 255, 255, 0.35);
+              margin-bottom: 1.5rem;
+              line-height: 1.6;
+              padding: 0.8rem;
+              background: rgba(255, 255, 255, 0.04);
+              border-radius: 10px;
+            "
+          >
+            📚 Result computed using
+            <strong style="color: rgba(255, 255, 255, 0.5)"
+              >Russell's Circumplex Model of Affect</strong
+            >
+            (1980) — mapping your Valence &amp; Arousal scores onto the
+            affective circumplex space.<br />
+            Watson, D., Clark, L.A., &amp; Tellegen, A. (1988).
+            <em
+              >Journal of Personality and Social Psychology, 54(6),
+              1063–1070.</em
+            >
+          </div>
+          <a
+            id="result-link"
+            href="mood-happy.html"
+            class="btn btn-primary"
+            data-transition
+            >See Your Movies →</a
+          >
+        </div>
+      </div>
+    </main>
+
+    <script src="main.js"></script>
+    <script>
+      const totalQ = 6;
+      let current = 0;
+      // Accumulate Valence and Arousal scores across all questions
+      let totalV = 0; // Valence  (positive = pleasant, negative = unpleasant)
+      let totalA = 0; // Arousal  (positive = high activation, negative = low activation)
+
+      /*
+      MOOD MAPPING on Russell's Circumplex (1980):
+      ─────────────────────────────────────────────
+      Excited     → High Valence (+), High Arousal (+)  → top-right quadrant
+      Happy       → High Valence (+), Medium Arousal    → right side
+      Romantic    → High Valence (+), Low Arousal (-)   → bottom-right quadrant
+      Overwhelmed → Low Valence (-),  High Arousal (+)  → top-left quadrant
+      Bored       → Neutral/Low Valence, Low Arousal(-) → bottom-center
+      Sad         → Low Valence (-),  Low Arousal (-)   → bottom-left quadrant
+    */
+      const moodMap = {
+        excited: {
+          emoji: "E",
+          label: "Excited",
+          desc: "High positive valence + high arousal. Your affective state maps to the top-right quadrant of the circumplex — energised, enthusiastic and ready for stimulation.",
+          url: "mood-excited.html",
+          color: "var(--snapdragon)",
+        },
+        happy: {
+          emoji: "H",
+          label: "Happy",
+          desc: "High positive valence + moderate arousal. A well-balanced positive affect state — engaged, content and open to the world around you.",
+          url: "mood-happy.html",
+          color: "var(--snapdragon)",
+        },
+        romantic: {
+          emoji: "R",
+          label: "Romantic",
+          desc: "High positive valence + low arousal. A warm, calm and pleasant affective state — open-hearted, tender and drawn toward closeness and connection.",
+          url: "mood-romantic.html",
+          color: "var(--pink)",
+        },
+        overwhelmed: {
+          emoji: "O",
+          label: "Overwhelmed",
+          desc: "Low valence + high arousal. Mapping to the distress zone of the circumplex — high activation paired with negative affect. Rest and calm stimuli are recommended.",
+          url: "mood-overwhelmed.html",
+          color: "var(--eucalyptus)",
+        },
+        bored: {
+          emoji: "B",
+          label: "Bored",
+          desc: "Neutral valence + low arousal. A state of low activation and minimal engagement — the circumplex places this near the deactivated-neutral zone.",
+          url: "mood-bored.html",
+          color: "var(--leaves)",
+        },
+        sad: {
+          emoji: "S",
+          label: "Sad",
+          desc: "Low valence + low arousal. Mapping to the bottom-left quadrant of the circumplex — a state of low energy paired with negative affect. A meaningful film may help.",
+          url: "mood-sad.html",
+          color: "var(--periwinkle)",
+        },
+      };
+
+      // Replace emoji placeholders with actual emoji
+      moodMap.excited.emoji = "⚡";
+      moodMap.happy.emoji = "😊";
+      moodMap.romantic.emoji = "💕";
+      moodMap.overwhelmed.emoji = "😮‍💨";
+      moodMap.bored.emoji = "😑";
+      moodMap.sad.emoji = "😢";
+
+      function initDots() {
+        const dots = document.getElementById("dots");
+        dots.innerHTML = "";
+        for (let i = 0; i < totalQ; i++) {
+          const d = document.createElement("div");
+          d.className = "dot" + (i === 0 ? " active" : "");
+          dots.appendChild(d);
+        }
+      }
+      initDots();
+
+      function updateProgress() {
+        document.getElementById("progress").style.width =
+          `${(current / totalQ) * 100}%`;
+        document.querySelectorAll(".dot").forEach((d, i) => {
+          d.className =
+            "dot" + (i < current ? " done" : i === current ? " active" : "");
+        });
+      }
+
+      function showQ(n) {
+        document
+          .querySelectorAll(".question-card")
+          .forEach((c) => c.classList.remove("active"));
+        document.querySelectorAll(".question-card")[n]?.classList.add("active");
+        document.getElementById("prev-btn").style.display = n > 0 ? "" : "none";
+        document.getElementById("next-btn").textContent =
+          n === totalQ - 1 ? "See My Mood ✨" : "Next →";
+        updateProgress();
+      }
+
+      function nextQ() {
+        const selected = document.querySelector(
+          `input[name="q${current}"]:checked`,
+        );
+        if (!selected) {
+          showToast("Please choose an option to continue");
+          return;
+        }
+        // Add this answer's V and A scores to totals
+        totalV += parseInt(selected.dataset.v);
+        totalA += parseInt(selected.dataset.a);
+
+        if (current < totalQ - 1) {
+          current++;
+          showQ(current);
+        } else {
+          showResult();
+        }
+      }
+
+      function prevQ() {
+        if (current > 0) {
+          // Subtract previous answer's scores before going back
+          const prevSelected = document.querySelector(
+            `input[name="q${current}"]:checked`,
+          );
+          if (prevSelected) {
+            totalV -= parseInt(prevSelected.dataset.v);
+            totalA -= parseInt(prevSelected.dataset.a);
+          }
+          current--;
+          showQ(current);
+        }
+      }
+
+      /*
+      CIRCUMPLEX CLASSIFICATION LOGIC:
+      Map final (V, A) scores onto Russell's 6-zone circumplex:
+
+        V >= 2  AND  A >= 2  → Excited     (top-right, high activation + pleasure)
+        V >= 2  AND  A >= 0  → Happy       (right, pleasure + moderate activation)
+        V >= 2  AND  A <  0  → Romantic    (bottom-right, pleasure + low activation)
+        V <  0  AND  A >= 2  → Overwhelmed (top-left, high activation + displeasure)
+        V <= 0  AND  A <  0  → Sad         (bottom-left, low activation + displeasure)
+        else                 → Bored       (center/bottom, neutral + low activation)
+    */
+      function classifyMood(v, a) {
+        if (v >= 2 && a >= 2) return "excited";
+        if (v >= 2 && a >= 0) return "happy";
+        if (v >= 2 && a < 0) return "romantic";
+        if (v < 0 && a >= 2) return "overwhelmed";
+        if (v <= 0 && a < 0) return "sad";
+        return "bored";
+      }
+
+      function showResult() {
+        const mood = classifyMood(totalV, totalA);
+        const info = moodMap[mood];
+
+        document.getElementById("progress").style.width = "100%";
+        document
+          .querySelectorAll(".dot")
+          .forEach((d) => (d.className = "dot done"));
+        document.getElementById("questions-container").style.display = "none";
+        document.getElementById("quiz-nav").style.display = "none";
+
+        // Populate result card
+        document.getElementById("result-emoji").textContent = info.emoji;
+        document.getElementById("result-mood-label").textContent = info.label;
+        document.getElementById("result-mood-label").style.background =
+          `linear-gradient(135deg, ${info.color}, var(--snapdragon))`;
+        document.getElementById("result-title").textContent =
+          "You are feeling " + info.label + "!";
+        document.getElementById("result-desc").textContent = info.desc;
+        document.getElementById("result-link").href = info.url;
+
+        // Show V / A scores
+        document.getElementById("result-scores").innerHTML = `
+        <div style="text-align:center;padding:.8rem 1.2rem;background:rgba(255,255,255,0.06);border-radius:12px;min-width:100px">
+          <div style="font-size:1.4rem;font-weight:700;color:${totalV >= 0 ? "var(--snapdragon)" : "var(--periwinkle)"}">${totalV > 0 ? "+" : ""}${totalV}</div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:.3rem">VALENCE SCORE<br><span style="font-size:0.65rem">(pleasure axis)</span></div>
+        </div>
+        <div style="text-align:center;padding:.8rem 1.2rem;background:rgba(255,255,255,0.06);border-radius:12px;min-width:100px">
+          <div style="font-size:1.4rem;font-weight:700;color:${totalA >= 0 ? "var(--snapdragon)" : "var(--periwinkle)"}">${totalA > 0 ? "+" : ""}${totalA}</div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:.3rem">AROUSAL SCORE<br><span style="font-size:0.65rem">(activation axis)</span></div>
+        </div>`;
+
+        const rc = document.getElementById("result-card");
+        rc.style.display = "block";
+        rc.style.animation = "fadeUp 0.7s ease";
+
+        const link = document.getElementById("result-link");
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          navigateTo(link.href);
+        });
+      }
+    </script>
+  </body>
+</html>
