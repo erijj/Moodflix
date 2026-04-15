@@ -197,10 +197,40 @@
       color: #000 !important;
       background: rgba(255,255,255,1) !important;
     }
-    [data-light] body {
-      background: linear-gradient(135deg, #e8eaf6 0%, #f3e5f5 50%, #e0f2f1 100%);
-      color: #1a1a2e;
-    }
+    /* This forces the background and general text */
+[data-light] body {
+  background: linear-gradient(
+    135deg,
+    #e8eaf6 0%,
+    #f3e5f5 50%,
+    #e0f2f1 100%
+  ) !important;
+  color: #000000 !important;
+}
+
+/* This targets EVERY piece of text inside light mode (cards, buttons, headers) */
+[data-light] h1, 
+[data-light] h2, 
+[data-light] h3, 
+[data-light] p, 
+[data-light] span, 
+[data-light] div,
+[data-light] a {
+  color: #000000 !important;
+}
+
+/* Restoring your original button style but ensuring black text */
+[data-light] .theme-toggle {
+  color: #000000 !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(0, 0, 0, 0.3) !important;
+  font-weight: 600;
+}
+
+[data-light] .theme-toggle:hover {
+  color: #000000 !important;
+  background: rgba(255, 255, 255, 1) !important;
+}
   </style>
 </head>
 <body>
