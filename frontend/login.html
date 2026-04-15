@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moodflix — Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .auth-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      max-width: 960px;
+      width: 100%;
+      min-height: 580px;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    /* ── Left panel — cinematic brand side ── */
+    .auth-brand {
+      background: linear-gradient(160deg, #0f3460 0%, #1a1a2e 60%, #16213e 100%);
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-brand::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: -80px;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245,143,154,0.18) 0%, transparent 70%);
+    }
+    .auth-brand::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; right: -60px;
+      width: 260px; height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(157,170,209,0.15) 0%, transparent 70%);
+    }
+    .brand-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      font-style: italic;
+      background: linear-gradient(135deg, var(--pink), var(--snapdragon));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+      position: relative;
+      z-index: 1;
+    }
+    .brand-tagline {
+      position: relative;
+      z-index: 1;
+    }
+    .brand-tagline h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+    .brand-tagline h2 em { font-style: italic; color: var(--pink); }
+    .brand-tagline p {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.7;
+    }
+    .brand-moods {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+    .brand-mood-chip {
+      padding: 0.3rem 0.8rem;
+      border-radius: 50px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── Right panel — form side ── */
+    .auth-form-side {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(30px);
+      border-left: 1px solid rgba(255,255,255,0.1);
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .auth-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    .auth-sub {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 2rem;
+    }
+    .auth-sub a {
+      color: var(--pink);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .auth-sub a:hover { text-decoration: underline; }
+
+    /* Form fields */
+    .field-group { margin-bottom: 1.2rem; }
+    .field-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .field-wrap {
+      position: relative;
+    }
+    .field-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+    .field-input {
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 2.8rem;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .field-input::placeholder { color: rgba(255,255,255,0.3); }
+    .field-input:focus {
+      border-color: var(--pink);
+      background: rgba(245,143,154,0.08);
+      box-shadow: 0 0 0 3px rgba(245,143,154,0.15);
+    }
+    .field-input.error {
+      border-color: #ff6b6b;
+      box-shadow: 0 0 0 3px rgba(255,107,107,0.15);
+    }
+    .field-error {
+      font-size: 0.75rem;
+      color: #ff8a8a;
+      margin-top: 0.4rem;
+      display: none;
+    }
+    .field-error.show { display: block; }
+
+    /* Password toggle */
+    .pass-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.4);
+      cursor: none;
+      font-size: 0.9rem;
+      padding: 0.2rem;
+      transition: color 0.2s;
+    }
+    .pass-toggle:hover { color: rgba(255,255,255,0.8); }
+
+    /* Remember + Forgot */
+    .auth-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .remember-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: none;
+    }
+    .remember-wrap input[type="checkbox"] { display: none; }
+    .custom-check {
+      width: 18px; height: 18px;
+      border-radius: 5px;
+      border: 2px solid rgba(255,255,255,0.25);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      cursor: none;
+    }
+    .remember-wrap input:checked + .custom-check {
+      background: var(--pink);
+      border-color: var(--pink);
+    }
+    .remember-wrap input:checked + .custom-check::after {
+      content: '✓';
+      font-size: 11px;
+      color: #fff;
+    }
+    .remember-label {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.55);
+      cursor: none;
+    }
+    .forgot-link {
+      font-size: 0.82rem;
+      color: var(--pink);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .forgot-link:hover { text-decoration: underline; }
+
+    /* Submit button */
+    .btn-login {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--pink), var(--snapdragon));
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(245,143,154,0.4);
+      margin-bottom: 1.2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(245,143,154,0.6);
+    }
+    .btn-login:active { transform: translateY(0); }
+    .btn-login.loading { opacity: 0.7; pointer-events: none; }
+    .btn-login .spinner {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+    .btn-login.loading .btn-text { display: none; }
+    .btn-login.loading .spinner { display: block; }
+
+    /* Divider */
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+    .auth-divider span {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* Guest button */
+    .btn-guest {
+      width: 100%;
+      padding: 0.85rem;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.7);
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: none;
+      transition: all 0.3s ease;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+    }
+    .btn-guest:hover {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border-color: rgba(255,255,255,0.25);
+    }
+
+    /* Demo credentials hint */
+    .demo-hint {
+      margin-top: 1rem;
+      padding: 0.7rem 1rem;
+      background: rgba(157,170,209,0.1);
+      border: 1px solid rgba(157,170,209,0.2);
+      border-radius: 10px;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.6;
+    }
+    .demo-hint strong { color: var(--periwinkle); }
+
+    /* Responsive */
+    @media (max-width: 680px) {
+      .auth-wrap { grid-template-columns: 1fr; }
+      .auth-brand { display: none; }
+      .auth-form-side { padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+
+  <div class="auth-wrap">
+    <!-- Brand Panel -->
+    <div class="auth-brand">
+      <a href="index.html" class="brand-logo" data-transition>Moodflix</a>
+      <div class="brand-tagline">
+        <h2>Cinema for every <em>emotion</em></h2>
+        <p>Log in to save your favourite films, build your watchlist and let us find the perfect movie for how you feel right now.</p>
+      </div>
+      <div class="brand-moods">
+        <span class="brand-mood-chip">😊 Happy</span>
+        <span class="brand-mood-chip">😢 Sad</span>
+        <span class="brand-mood-chip">⚡ Excited</span>
+        <span class="brand-mood-chip">😮‍💨 Overwhelmed</span>
+        <span class="brand-mood-chip">😑 Bored</span>
+      </div>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="auth-form-side">
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-sub">No account? <a href="register.html" data-transition>Create one free</a></p>
+
+      <form id="login-form" novalidate>
+        <!-- Email -->
+        <div class="field-group">
+          <label class="field-label" for="email">Email address</label>
+          <div class="field-wrap">
+            <span class="field-icon">✉️</span>
+            <input type="email" id="email" class="field-input" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <p class="field-error" id="email-error">Please enter a valid email address.</p>
+        </div>
+
+        <!-- Password -->
+        <div class="field-group">
+          <label class="field-label" for="password">Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input type="password" id="password" class="field-input" placeholder="Your password" autocomplete="current-password" />
+            <button type="button" class="pass-toggle" id="pass-toggle" aria-label="Show password">👁</button>
+          </div>
+          <p class="field-error" id="pass-error">Password must be at least 6 characters.</p>
+        </div>
+
+        <!-- Remember + Forgot -->
+        <div class="auth-meta">
+          <label class="remember-wrap">
+            <input type="checkbox" id="remember" />
+            <span class="custom-check"></span>
+            <span class="remember-label">Remember me</span>
+          </label>
+          <a href="forgot-password.html" class="forgot-link" data-transition>Forgot password?</a>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-login" id="login-btn">
+          <span class="btn-text">Sign In</span>
+          <div class="spinner"></div>
+        </button>
+      </form>
+
+      <div class="auth-divider"><span>or</span></div>
+      <a href="index.html" class="btn-guest" data-transition>👀 Continue as guest</a>
+
+      <div class="demo-hint">
+        <strong>Demo credentials:</strong><br>
+        Email: <strong>demo@moodflix.com</strong> &nbsp;/&nbsp; Password: <strong>moodflix123</strong>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+  <script>
+    // Password toggle
+    const passInput = document.getElementById('password');
+    document.getElementById('pass-toggle').addEventListener('click', () => {
+      const isText = passInput.type === 'text';
+      passInput.type = isText ? 'password' : 'text';
+      document.getElementById('pass-toggle').textContent = isText ? '👁' : '🙈';
+    });
+
+    // Form validation + login logic
+    document.getElementById('login-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      let valid = true;
+
+      const email = document.getElementById('email');
+      const pass  = document.getElementById('password');
+      const emailErr = document.getElementById('email-error');
+      const passErr  = document.getElementById('pass-error');
+
+      // Reset errors
+      [email, pass].forEach(f => f.classList.remove('error'));
+      [emailErr, passErr].forEach(e => e.classList.remove('show'));
+
+      // Validate email
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+        email.classList.add('error');
+        emailErr.classList.add('show');
+        valid = false;
+      }
+      // Validate password
+      if (pass.value.length < 6) {
+        pass.classList.add('error');
+        passErr.classList.add('show');
+        valid = false;
+      }
+      if (!valid) return;
+
+      // Loading state
+      const btn = document.getElementById('login-btn');
+      btn.classList.add('loading');
+
+      // Simulate auth check (demo credentials)
+      await new Promise(r => setTimeout(r, 1800));
+
+      const DEMO_EMAIL = 'demo@moodflix.com';
+      const DEMO_PASS  = 'moodflix123';
+
+      if (email.value.trim() === DEMO_EMAIL && pass.value === DEMO_PASS) {
+        // Save session
+        localStorage.setItem('moodflix_user', JSON.stringify({
+          name: 'Demo User',
+          email: DEMO_EMAIL,
+          loggedIn: true
+        }));
+        if (document.getElementById('remember').checked) {
+          localStorage.setItem('moodflix_remember', 'true');
+        }
+        navigateTo('access-granted.html');
+      } else {
+        btn.classList.remove('loading');
+        navigateTo('access-denied.html');
+      }
+    });
+  </script>
+</body>
+</html>

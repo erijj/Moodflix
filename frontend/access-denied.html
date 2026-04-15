@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moodflix — Access Denied</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #1f0d0d 0%, #2e1616 50%, #1a0f0f 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .denied-wrap {
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    /* Animated X circle */
+    .x-circle {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e05555, #c0392b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2rem;
+      box-shadow: 0 0 60px rgba(220,80,80,0.5), 0 0 120px rgba(220,80,80,0.2);
+      animation: pulse-red 2s ease-in-out infinite;
+      position: relative;
+    }
+    @keyframes pulse-red {
+      0%, 100% { box-shadow: 0 0 40px rgba(220,80,80,0.5), 0 0 80px rgba(220,80,80,0.2); }
+      50%       { box-shadow: 0 0 80px rgba(220,80,80,0.8), 0 0 160px rgba(220,80,80,0.3); }
+    }
+    .x-circle::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid rgba(220,80,80,0.3);
+      animation: ring-expand-red 2s ease-in-out infinite;
+    }
+    @keyframes ring-expand-red {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50%       { transform: scale(1.12); opacity: 0; }
+    }
+    .x-icon {
+      font-size: 2.8rem;
+      animation: bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+    }
+    @keyframes bounceIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .denied-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 1rem;
+      border-radius: 50px;
+      background: rgba(220,80,80,0.12);
+      border: 1px solid rgba(220,80,80,0.3);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #ff8a8a;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .denied-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.8rem;
+      line-height: 1.1;
+    }
+    .denied-title em { font-style: italic; color: #ff8a8a; }
+
+    .denied-desc {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 0.8rem;
+      line-height: 1.7;
+    }
+
+    /* Error detail box */
+    .error-box {
+      background: rgba(220,80,80,0.08);
+      border: 1px solid rgba(220,80,80,0.2);
+      border-radius: 14px;
+      padding: 1.2rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+    .error-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 0.6rem;
+    }
+    .error-item:last-child { margin-bottom: 0; }
+    .error-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #ff6b6b;
+      flex-shrink: 0;
+    }
+
+    /* Attempts counter */
+    .attempts-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.4);
+    }
+    .attempt-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(220,80,80,0.4);
+      border: 1px solid rgba(220,80,80,0.5);
+    }
+    .attempt-dot.used { background: #e05555; }
+
+    .denied-actions {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-retry {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 2rem;
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: none;
+      border: none;
+      text-decoration: none;
+      background: linear-gradient(135deg, #e05555, #c0392b);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(220,80,80,0.4);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-retry:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(220,80,80,0.6);
+    }
+    .btn-retry::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.15);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .btn-retry:hover::before { transform: scaleX(1); }
+
+    /* Shake animation on load */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%       { transform: translateX(-8px); }
+      40%       { transform: translateX(8px); }
+      60%       { transform: translateX(-5px); }
+      80%       { transform: translateX(5px); }
+    }
+    .x-circle { animation: pulse-red 2s ease-in-out infinite, shake 0.6s ease 0.5s; }
+  </style>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+
+  <div class="denied-wrap">
+    <div class="x-circle">
+      <span class="x-icon">✕</span>
+    </div>
+
+    <div class="denied-badge">⚠ Access Denied</div>
+    <h1 class="denied-title">Wrong <em>credentials</em></h1>
+    <p class="denied-desc">We could not verify your identity. Please check your email and password and try again.</p>
+
+    <div class="error-box">
+      <div class="error-item"><div class="error-dot"></div>Email or password is incorrect</div>
+      <div class="error-item"><div class="error-dot"></div>Passwords are case-sensitive — check Caps Lock</div>
+      <div class="error-item"><div class="error-dot"></div>Make sure you are using your registered email</div>
+    </div>
+
+    <div class="attempts-wrap">
+      <span>Attempts: </span>
+      <div class="attempt-dot used" id="d1"></div>
+      <div class="attempt-dot" id="d2"></div>
+      <div class="attempt-dot" id="d3"></div>
+      <span id="attempts-left">2 remaining</span>
+    </div>
+
+    <div class="denied-actions">
+      <a href="login.html" class="btn-retry" data-transition>🔄 Try Again</a>
+      <a href="forgot-password.html" class="btn btn-glass" data-transition>🔑 Reset Password</a>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+  <script>
+    // Track attempts in sessionStorage
+    let attempts = parseInt(sessionStorage.getItem('moodflix_attempts') || '0') + 1;
+    sessionStorage.setItem('moodflix_attempts', attempts);
+
+    const dots = [document.getElementById('d1'), document.getElementById('d2'), document.getElementById('d3')];
+    const left = document.getElementById('attempts-left');
+    const maxAttempts = 3;
+    const used = Math.min(attempts, maxAttempts);
+    const remaining = maxAttempts - used;
+
+    dots.forEach((d, i) => {
+      if (i < used) d.classList.add('used');
+    });
+    left.textContent = remaining > 0 ? `${remaining} remaining` : 'No attempts left';
+
+    
+    if (attempts >= maxAttempts) {
+      document.querySelector('.btn-retry').style.opacity = '0.4';
+      document.querySelector('.btn-retry').style.pointerEvents = 'none';
+      document.querySelector('.denied-desc').textContent =
+        'Too many failed attempts. Please reset your password or try again later.';
+    }
+  </script>
+</body>
+</html>

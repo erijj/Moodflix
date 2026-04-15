@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moodflix — Create Account</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .auth-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      max-width: 960px;
+      width: 100%;
+      min-height: 640px;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.8s ease both;
+    }
+    .auth-brand {
+      background: linear-gradient(160deg, #0f3460 0%, #1a1a2e 60%, #16213e 100%);
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      order: 2;
+    }
+    .auth-brand::before {
+      content: '';
+      position: absolute;
+      bottom: -80px; right: -80px;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(142,175,146,0.18) 0%, transparent 70%);
+    }
+    .auth-brand::after {
+      content: '';
+      position: absolute;
+      top: -60px; left: -60px;
+      width: 260px; height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(244,201,132,0.12) 0%, transparent 70%);
+    }
+    .brand-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      font-style: italic;
+      background: linear-gradient(135deg, var(--pink), var(--snapdragon));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+      position: relative;
+      z-index: 1;
+    }
+    .brand-tagline { position: relative; z-index: 1; }
+    .brand-tagline h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+    .brand-tagline h2 em { font-style: italic; color: var(--eucalyptus); }
+    .brand-tagline p { font-size: 0.9rem; color: rgba(255,255,255,0.55); line-height: 1.7; }
+    .brand-features { position: relative; z-index: 1; }
+    .brand-feature {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.65);
+    }
+    .brand-feature span:first-child { font-size: 1.1rem; }
+
+    .auth-form-side {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(30px);
+      border-right: 1px solid rgba(255,255,255,0.1);
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      order: 1;
+    }
+    .auth-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    .auth-sub {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 1.8rem;
+    }
+    .auth-sub a { color: var(--pink); text-decoration: none; font-weight: 500; }
+    .auth-sub a:hover { text-decoration: underline; }
+
+    /* Two columns for name fields */
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+
+    .field-group { margin-bottom: 1rem; }
+    .field-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+    }
+    .field-wrap { position: relative; }
+    .field-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+    .field-input {
+      width: 100%;
+      padding: 0.8rem 1rem 0.8rem 2.8rem;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .field-input::placeholder { color: rgba(255,255,255,0.3); }
+    .field-input:focus {
+      border-color: var(--eucalyptus);
+      background: rgba(142,175,146,0.08);
+      box-shadow: 0 0 0 3px rgba(142,175,146,0.15);
+    }
+    .field-input.error { border-color: #ff6b6b; box-shadow: 0 0 0 3px rgba(255,107,107,0.15); }
+    .field-error { font-size: 0.72rem; color: #ff8a8a; margin-top: 0.35rem; display: none; }
+    .field-error.show { display: block; }
+
+    /* Password strength */
+    .strength-bar {
+      display: flex;
+      gap: 4px;
+      margin-top: 0.5rem;
+    }
+    .strength-seg {
+      height: 3px;
+      flex: 1;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.1);
+      transition: background 0.3s;
+    }
+    .strength-label {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.4);
+      margin-top: 0.3rem;
+    }
+
+    .pass-toggle {
+      position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: rgba(255,255,255,0.4);
+      cursor: none; font-size: 0.9rem; padding: 0.2rem; transition: color 0.2s;
+    }
+    .pass-toggle:hover { color: rgba(255,255,255,0.8); }
+
+    /* Terms */
+    .terms-wrap {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      margin-bottom: 1.2rem;
+      cursor: none;
+    }
+    .terms-wrap input[type="checkbox"] { display: none; }
+    .custom-check {
+      width: 18px; height: 18px; flex-shrink: 0;
+      border-radius: 5px;
+      border: 2px solid rgba(255,255,255,0.25);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; margin-top: 1px;
+    }
+    .terms-wrap input:checked + .custom-check {
+      background: var(--eucalyptus);
+      border-color: var(--eucalyptus);
+    }
+    .terms-wrap input:checked + .custom-check::after { content: '✓'; font-size: 11px; color: #fff; }
+    .terms-text { font-size: 0.78rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+    .terms-text a { color: var(--eucalyptus); text-decoration: none; }
+
+    .btn-register {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--eucalyptus), var(--snapdragon));
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(142,175,146,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-register:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(142,175,146,0.6);
+    }
+    .btn-register.loading { opacity: 0.7; pointer-events: none; }
+    .btn-register .spinner {
+      display: none; width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+      border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto;
+    }
+    .btn-register.loading .btn-text { display: none; }
+    .btn-register.loading .spinner { display: block; }
+
+    @media (max-width: 680px) {
+      .auth-wrap { grid-template-columns: 1fr; }
+      .auth-brand { display: none; }
+      .auth-form-side { padding: 2rem 1.5rem; order: 1; }
+      .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+
+  <div class="auth-wrap">
+    <!-- Form Panel -->
+    <div class="auth-form-side">
+      <h1 class="auth-title">Create account</h1>
+      <p class="auth-sub">Already have one? <a href="login.html" data-transition>Sign in</a></p>
+
+      <form id="register-form" novalidate>
+        <!-- Name row -->
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" for="fname">First name</label>
+            <div class="field-wrap">
+              <span class="field-icon">👤</span>
+              <input type="text" id="fname" class="field-input" placeholder="Nadine" />
+            </div>
+            <p class="field-error" id="fname-error">Required.</p>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="lname">Last name</label>
+            <div class="field-wrap">
+              <span class="field-icon">👤</span>
+              <input type="text" id="lname" class="field-input" placeholder="Ben Ali" />
+            </div>
+            <p class="field-error" id="lname-error">Required.</p>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="field-group">
+          <label class="field-label" for="email">Email address</label>
+          <div class="field-wrap">
+            <span class="field-icon">✉️</span>
+            <input type="email" id="email" class="field-input" placeholder="you@example.com" />
+          </div>
+          <p class="field-error" id="email-error">Please enter a valid email.</p>
+        </div>
+
+        <!-- Password -->
+        <div class="field-group">
+          <label class="field-label" for="password">Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input type="password" id="password" class="field-input" placeholder="Min. 8 characters" />
+            <button type="button" class="pass-toggle" id="pass-toggle">👁</button>
+          </div>
+          <div class="strength-bar">
+            <div class="strength-seg" id="s1"></div>
+            <div class="strength-seg" id="s2"></div>
+            <div class="strength-seg" id="s3"></div>
+            <div class="strength-seg" id="s4"></div>
+          </div>
+          <p class="strength-label" id="strength-label">Enter a password</p>
+          <p class="field-error" id="pass-error">Password must be at least 8 characters.</p>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="field-group">
+          <label class="field-label" for="confirm">Confirm password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input type="password" id="confirm" class="field-input" placeholder="Repeat password" />
+          </div>
+          <p class="field-error" id="confirm-error">Passwords do not match.</p>
+        </div>
+
+        <!-- Terms -->
+        <label class="terms-wrap">
+          <input type="checkbox" id="terms" />
+          <span class="custom-check"></span>
+          <span class="terms-text">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+        </label>
+        <p class="field-error" id="terms-error" style="margin-bottom:0.8rem">You must accept the terms.</p>
+
+        <button type="submit" class="btn-register" id="register-btn">
+          <span class="btn-text">Create my account</span>
+          <div class="spinner"></div>
+        </button>
+      </form>
+    </div>
+
+    <!-- Brand Panel -->
+    <div class="auth-brand">
+      <a href="index.html" class="brand-logo" data-transition>Moodflix</a>
+      <div class="brand-tagline">
+        <h2>Your cinema,<br/><em>personalised</em></h2>
+        <p>Join Moodflix and unlock a fully personalised movie experience built around how you feel each day.</p>
+      </div>
+      <div class="brand-features">
+        <div class="brand-feature"><span>❤️</span> Save films to your Liked collection</div>
+        <div class="brand-feature"><span>📌</span> Build your personal Watchlist</div>
+        <div class="brand-feature"><span>⭐</span> Rate and review every film you watch</div>
+        <div class="brand-feature"><span>🧠</span> Take our science-based mood quiz</div>
+        <div class="brand-feature"><span>🎲</span> Get random picks from your Watchlist</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+  <script>
+    // Password toggle
+    const passInput = document.getElementById('password');
+    document.getElementById('pass-toggle').addEventListener('click', () => {
+      const isText = passInput.type === 'text';
+      passInput.type = isText ? 'password' : 'text';
+      document.getElementById('pass-toggle').textContent = isText ? '👁' : '🙈';
+    });
+
+    // Password strength
+    passInput.addEventListener('input', () => {
+      const v = passInput.value;
+      const segs = [document.getElementById('s1'), document.getElementById('s2'), document.getElementById('s3'), document.getElementById('s4')];
+      const label = document.getElementById('strength-label');
+      let score = 0;
+      if (v.length >= 8) score++;
+      if (/[A-Z]/.test(v)) score++;
+      if (/[0-9]/.test(v)) score++;
+      if (/[^A-Za-z0-9]/.test(v)) score++;
+      const colors = ['#ff6b6b', '#ffaa00', '#f4c984', '#8eaf92'];
+      const labels = ['Weak', 'Fair', 'Good', 'Strong'];
+      segs.forEach((s, i) => {
+        s.style.background = i < score ? colors[score - 1] : 'rgba(255,255,255,0.1)';
+      });
+      label.textContent = v.length === 0 ? 'Enter a password' : labels[score - 1] || 'Too short';
+      label.style.color = score > 0 ? colors[score - 1] : 'rgba(255,255,255,0.4)';
+    });
+
+    // Form submit
+    document.getElementById('register-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      let valid = true;
+      const fields = {
+        fname: { el: document.getElementById('fname'), err: document.getElementById('fname-error'), check: v => v.trim().length > 0 },
+        lname: { el: document.getElementById('lname'), err: document.getElementById('lname-error'), check: v => v.trim().length > 0 },
+        email: { el: document.getElementById('email'), err: document.getElementById('email-error'), check: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+        password: { el: passInput, err: document.getElementById('pass-error'), check: v => v.length >= 8 },
+        confirm: { el: document.getElementById('confirm'), err: document.getElementById('confirm-error'), check: v => v === passInput.value },
+      };
+
+      Object.values(fields).forEach(f => { f.el.classList.remove('error'); f.err.classList.remove('show'); });
+      document.getElementById('terms-error').classList.remove('show');
+
+      Object.values(fields).forEach(f => {
+        if (!f.check(f.el.value)) { f.el.classList.add('error'); f.err.classList.add('show'); valid = false; }
+      });
+      if (!document.getElementById('terms').checked) {
+        document.getElementById('terms-error').classList.add('show');
+        valid = false;
+      }
+      if (!valid) return;
+
+      const btn = document.getElementById('register-btn');
+      btn.classList.add('loading');
+      await new Promise(r => setTimeout(r, 1800));
+
+      // Save new user to localStorage
+      localStorage.setItem('moodflix_user', JSON.stringify({
+        name: document.getElementById('fname').value.trim() + ' ' + document.getElementById('lname').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        loggedIn: true
+      }));
+      localStorage.setItem('moodflix_username', document.getElementById('fname').value.trim());
+      navigateTo('access-granted.html');
+    });
+  </script>
+</body>
+</html>
