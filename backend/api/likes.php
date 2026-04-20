@@ -81,7 +81,7 @@ if ($method === 'POST') {
 // ── DELETE :supprimer le like 
 
 if ($method === 'DELETE') {
-    $movie_id=trim($body[movie_id]??'');
+    $movie_id = trim($body['movie_id'] ?? '');
 
     $stmt =$db->prepare('DELETE FROM likes where user_id=? AND movie_id=?');
     $stmt->execute([$user['id'],$movie_id]);
@@ -90,3 +90,4 @@ if ($method === 'DELETE') {
 }
 
 jsonResponse(['error' => 'Method not allowed.'], 405);
+?>

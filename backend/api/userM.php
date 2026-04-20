@@ -307,3 +307,4 @@ if ($action === 'get_stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 
 // -- Action inconnue
 jsonResponse(['error' => 'Action invalide.'], 400);
+?>

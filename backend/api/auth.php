@@ -175,3 +175,4 @@ if ($action === 'reset_password' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     jsonResponse(['success' => true, 'message' => 'Mot de passe réinitialisé avec succès. Vous pouvez vous connecter.']);
 }
+?>

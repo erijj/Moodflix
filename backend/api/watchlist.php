@@ -100,3 +100,4 @@ if ($method === 'DELETE') {
 }
 
 jsonResponse(['error' => 'Method not allowed.'], 405);
+?>

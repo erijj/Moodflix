@@ -11,24 +11,23 @@ define('DB_NAME', 'moodflix');   // le nom de notre base de données
 
 // cette fonction crée la connexion à la DB
 function getDB(){
-    try{
-        $connexion=new PDO(
-            'mysql:host=localhost;dbname=moodflix';charset=utf8mb4,'root',''
-        );
+    try {
+        // Correction : virgules au lieu de point-virgule et paramètres propres
+        $connexion = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4', DB_USER, DB_PASS);
+        $connexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $connexion->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         return $connexion;
-    }catch(Exception $e){
-        //si la cnx échoue ,on affiche une erreur
-        echo json_encode(['erreur =>'impossible de se connecter à la DB']);
+    } catch(Exception $e) {
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Impossible de se connecter à la DB']);
         exit;
-    }
     }
 }
 
 // cette fonction envoie une réponse JSON au navigateur
-function jsonResponse($data,$code = 200): {
-    http_response_code($code);                 // le code HTTP (200 = OK, 400 = erreur...)
-    header('Content-Type: application/json');  // on dit qu'on envoie du JSON
-    echo json_encode($data);                   // on convertit en JSON et on envoie
+function jsonResponse($data, $code = 200) { 
+    http_response_code($code);
+    echo json_encode($data);
     exit;
 }
 
